@@ -39,8 +39,16 @@ if(NOT WIN32
   add_compile_options(-msse4.2 -maes)
 endif()
 
-add_library(${CMAKE_PROJECT_NAME} SHARED EXCLUDE_FROM_ALL ${SRC})
-include_directories(BEFORE ${CMAKE_BINARY_DIR}/include)
+add_library(${CMAKE_PROJECT_NAME} SHARED EXCLUDE_FROM_ALL ${SRC} ${HEADERS})
+include_directories(
+					BEFORE 
+					${CMAKE_SOURCE_DIR}/include
+					${CMAKE_SOURCE_DIR}/include/raymarine
+					${CMAKE_SOURCE_DIR}/include/navico
+					${CMAKE_SOURCE_DIR}/include/garminxhd
+					${CMAKE_SOURCE_DIR}/include/garminhd
+					${CMAKE_SOURCE_DIR}/include/emulator
+)
 
 add_subdirectory("opencpn-libs/${PKG_API_LIB}")
 if(${PKG_NAME} MATCHES wx32)
