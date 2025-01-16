@@ -33,6 +33,7 @@
 #define RADAR_PI_GLOBALS
 
 #include "radar_pi.h"
+#include "RadarPanel.h"
 
 #include "Arpa.h"
 #include "GuardZone.h"
@@ -46,6 +47,7 @@
 #include "nmea0183.h"
 #include "nmea0183.hpp"
 #include "raymarine/RaymarineLocate.h"
+#include "DpRadarCommand.h"
 
 namespace RadarPlugin {
 using ::NMEA0183;
@@ -139,11 +141,13 @@ GeoPosition local_position(GeoPosition &pos, double distance, double bearing) {
 
 enum { TIMER_ID = 51 };
 enum { UPDATE_TIMER_ID = 52 };
+enum { PPI_TIMER_ID = 53 };  // Timer for PPI updates
 
 #define UPDATE_INTERVAL 500
 BEGIN_EVENT_TABLE(radar_pi, wxEvtHandler)
 EVT_TIMER(TIMER_ID, radar_pi::OnTimerNotify)
 EVT_TIMER(UPDATE_TIMER_ID, radar_pi::TimedUpdate)
+EVT_TIMER(PPI_TIMER_ID, radar_pi::OnPPITimerNotify)
 END_EVENT_TABLE()
 
 //---------------------------------------------------------------------------------------------------------
@@ -152,7 +156,7 @@ END_EVENT_TABLE()
 //
 //---------------------------------------------------------------------------------------------------------
 
-radar_pi::radar_pi(void *ppimgr) : opencpn_plugin_116(ppimgr), m_raymarine_locator(0) {
+radar_pi::radar_pi(void *ppimgr) : opencpn_plugin_119(ppimgr), m_raymarine_locator(0) {
   m_boot_time = wxGetUTCTimeMillis();
   m_initialized = false;
   m_predicted_position_initialised = false;
@@ -170,6 +174,7 @@ radar_pi::radar_pi(void *ppimgr) : opencpn_plugin_116(ppimgr), m_raymarine_locat
 
   m_timer = 0;
   m_update_timer = 0;
+  m_ppi_timer = 0;
   for (int r = 0; r < RADARS; r++) {
     m_context_menu_control_id[r] = -1;
   }
@@ -211,6 +216,8 @@ int radar_pi::Init(void) {
   }
 
   time_t now = time(0);
+
+  m_dpRadarCommand = new DpRadarCommand(this);
 
   // Font can change so initialize every time
   m_font = GetOCPNGUIScaledFont_PlugIn(_T("Dialog"));
@@ -273,7 +280,7 @@ int radar_pi::Init(void) {
 
   // Get a pointer to the opencpn display canvas, to use as a parent for the UI
   // dialog
-  m_parent_window = GetOCPNCanvasWindow();
+  m_parent_window = GetOCPNCanvasWindow()->GetParent();
   m_shareLocn = GetPluginDataDir("radar_pi") + wxFileName::GetPathSeparator() + _T("data") + wxFileName::GetPathSeparator();
 
   m_pMessageBox = new MessageBox;
@@ -385,6 +392,8 @@ int radar_pi::Init(void) {
   m_timer = new wxTimer(this, TIMER_ID);
   m_update_timer = new wxTimer(this, UPDATE_TIMER_ID);
   m_update_timer->Start(UPDATE_INTERVAL);
+  m_ppi_timer = new wxTimer(this, PPI_TIMER_ID);
+  StartPPIRefresh(true);
 
   return PLUGIN_OPTIONS;
 }
@@ -449,6 +458,11 @@ bool radar_pi::DeInit(void) {
     delete m_update_timer;
     m_update_timer = 0;
   }
+  if (m_ppi_timer) {
+    m_ppi_timer->Stop();
+    delete m_ppi_timer;
+    m_ppi_timer = 0;
+  }
 
   StopRadarLocators();
 
@@ -457,19 +471,25 @@ bool radar_pi::DeInit(void) {
   // can be saved.
   for (size_t r = 0; r < M_SETTINGS.radar_count; r++) {
     m_radar[r]->Shutdown();
+    LOG_INFO(wxT("DeInit 5"));
   }
+  LOG_INFO(wxT("DeInit 6"));
 
   StopRadarLocators();
 
+  LOG_INFO(wxT("DeInit 7"));
   if (m_bogey_dialog) {
     delete m_bogey_dialog;  // This will also save its current pos in m_settings
     m_bogey_dialog = 0;
   }
+  LOG_INFO(wxT("DeInit 8"));
   SaveConfig();
 
+  LOG_INFO(wxT("DeInit 9"));
   RemoveCanvasContextMenuItem(m_context_menu_show_id);
   RemoveCanvasContextMenuItem(m_context_menu_hide_id);
   RemoveCanvasContextMenuItem(m_context_menu_acquire_radar_target);
+  LOG_INFO(wxT("DeInit 10"));
   RemoveCanvasContextMenuItem(m_context_menu_delete_radar_target);
   RemoveCanvasContextMenuItem(m_context_menu_delete_all_radar_targets);
   LOG_INFO(wxT("radar_pi Context menus removed"));
@@ -494,7 +514,7 @@ bool radar_pi::DeInit(void) {
   }
 
   // No need to delete wxWindow stuff, wxWidgets does this for us.
-  LOG_VERBOSE(wxT("DeInit of plugin done"));
+  LOG_INFO(wxT("DeInit of plugin done"));
   return true;
 }
 
@@ -541,6 +561,9 @@ bool radar_pi::EnsureRadarSelectionComplete(bool force) {
 }
 
 bool radar_pi::MakeRadarSelection() {
+
+  return SelectRadarType(0);
+
   bool ret = false;
 
   size_t radar_count;
@@ -1033,11 +1056,13 @@ void radar_pi::ScheduleWindowRefresh() {
   CLEAR_STRUCT(renderPPI);
   CLEAR_STRUCT(render_overlay);
 
+  /*
   for (size_t r = 0; r < M_SETTINGS.radar_count; r++) {
     m_radar[r]->RefreshDisplay();
     drawTime += (renderPPI[r] = m_radar[r]->GetDrawTime());
     doppler_count += m_radar[r]->GetDopplerCount();
   }
+  */
 
   int max_canvas = GetCanvasCount();
   for (int r = 0; r < max_canvas; r++) {
@@ -1104,9 +1129,11 @@ void radar_pi::TimedControlUpdate() {
     return;  // Don't run this more often than 2 times per second
   }
   // following is to prevent crash in RadarPanel::ShowFrame on m_aui_mgr->Update() line 222,
+  /*
   if (m_max_canvas <= 0 || (m_max_canvas > 1 && m_current_canvas_index == 0)) {
     return;
   }
+  */
 
   m_notify_time_ms = now;
 
@@ -1118,7 +1145,7 @@ void radar_pi::TimedControlUpdate() {
     SetRadarWindowViz(true);
     updateAllControls = true;
   }
-
+  
   if (m_pMessageBox->IsShown() || (g_verbose != 0)) {
     wxString t;
     for (size_t r = 0; r < M_SETTINGS.radar_count; r++) {
@@ -1421,7 +1448,7 @@ bool radar_pi::RenderGLOverlayMultiCanvas(wxGLContext *pcontext, PlugIn_ViewPort
     m_cog = m_COGAvg;
     m_vp_rotation = vp->rotation;
   }
-
+ 
   if (M_SETTINGS.show                                                     // Radar shown
       && current_overlay_radar > -1                                       // Overlay desired
       && current_overlay_radar < (int)M_SETTINGS.radar_count              // and still valid
@@ -1538,7 +1565,7 @@ bool radar_pi::LoadConfig(void) {
         continue;
       }
       pConf->Read(wxString::Format(wxT("Radar%dType"), r), &s, "unknown");
-      ri->m_radar_type = RT_MAX;  // = not used
+      ri->m_radar_type = RT_EMULATOR;  // = not used
       for (int i = 0; i < RT_MAX; i++) {
         if (s.IsSameAs(RadarTypeName[i])) {
           ri->m_radar_type = (RadarType)i;
@@ -1953,6 +1980,10 @@ void radar_pi::UpdateCOGAvg(double cog) {
 }
 
 void radar_pi::SetPluginMessage(wxString &message_id, wxString &message_body) {
+
+  if (m_dpRadarCommand && m_dpRadarCommand->ProcessMessage(message_id, message_body)) {
+      return;
+  }
   static const wxString WMM_VARIATION_BOAT = wxString(_T("WMM_VARIATION_BOAT"));
   wxString info;
   if (message_id.Cmp(WMM_VARIATION_BOAT) == 0) {
@@ -2202,5 +2233,113 @@ void radar_pi::logBinaryData(const wxString &what, const uint8_t *data, int size
 bool radar_pi::IsRadarOnScreen(int radar) {
   return m_settings.show && (m_settings.show_radar[radar] || m_radar[radar]->GetOverlayCanvasIndex() > -1);
 }
+
+/**************************************************** Deeprey Plugin ***********************************************************************/
+bool radar_pi::SelectRadarType(int type, bool reLoad) {
+
+
+  m_initialized = false;
+
+  m_settings.show = false;
+  m_settings.show_radar[0] = false;
+  NotifyRadarWindowViz();
+  TimedControlUpdate();
+
+  RadarType radarType = RadarType::RT_MAX;
+  if (reLoad) {
+      radarType = m_radar[0]->m_radar_type;
+  } else {
+      radarType = static_cast<RadarType>(type);
+  }
+
+
+  if (m_radar[0]) {
+      m_radar[0]->RequestRadarState(RADAR_STANDBY);
+      // ou m_radar[r]->RequestRadarState(RADAR_OFF);
+      // ou encore juste "Hide overlay"
+      m_radar[0]->m_overlay_canvas[0].Update(0);
+      m_radar[0]->m_overlay_canvas[1].Update(0);
+      // si vous avez 2 canvases, etc.
+
+      m_radar[0]->Shutdown();
+      RemoveCanvasContextMenuItem(m_context_menu_control_id[0]);
+
+      StopRadarLocators();
+      delete m_radar[0];
+      m_radar[0] = 0;
+  }
+
+  m_settings.window_pos[0] = wxPoint(100, 100);
+  m_settings.control_pos[0] = wxDefaultPosition;
+  m_radar[0] = new RadarInfo(this, 0);
+  m_radar[0]->m_radar_type = radarType;  // modify type of existing radar ?
+  m_settings.radar_count = 1;
+
+  m_radar[0]->Init();
+
+  StartRadarLocators(0);
+
+  m_settings.show = true;
+  m_settings.show_radar[0] = true;
+  SetRadarWindowViz();
+
+  TimedControlUpdate();
+
+  m_initialized = true;
+  SaveConfig();
+  m_dpRadarCommand->SendNewRadarInfo();
+ 
+  return true;
+}
+
+void radar_pi::StartPPIRefresh(bool enable)
+{
+    if (!m_ppi_timer) {
+        return;
+    }
+
+    if (enable) {
+        m_ppi_timer->StartOnce(50);   
+    } else {
+        m_ppi_timer->Stop();
+    }
+}
+
+void radar_pi::OnPPITimerNotify(wxTimerEvent &event)
+{
+   
+    int drawTimePPI = 0;
+    
+    // Parcours de tous les radars
+    for (size_t r = 0; r < m_settings.radar_count; r++) {
+
+      bool radarPanelIsVisible = m_radar[r]->m_radar_panel->IsShownOnScreen();
+
+      if (!radarPanelIsVisible) {
+        LOG_INFO("La fenetre du radar n'est plus visible");
+      }
+
+      if (!m_settings.show_radar[r]) {
+        LOG_INFO("Le settings m_settings.show_radar retourne un false");
+      }
+
+      if (m_settings.show_radar[r] && radarPanelIsVisible) {
+            // 1) Mise à jour interne de l'image (analyse, traitement, etc.)
+            m_radar[r]->RefreshDisplay();
+            //m_radar[r]->m_radar_panel->Refresh();
+            drawTimePPI += m_radar[r]->GetDrawTime(); 
+      }
+    }
+    
+    int refreshrate = m_settings.refreshrate.GetValue();
+    if (refreshrate > 1 && drawTimePPI < 500) {
+        int millis = (1000 - drawTimePPI) / (1 << (refreshrate - 1)) + drawTimePPI;
+        m_ppi_timer->StartOnce(millis);
+    } else {
+        m_ppi_timer->Start(500, wxTIMER_CONTINUOUS);
+    }
+    
+}
+
 
 }  // namespace RadarPlugin

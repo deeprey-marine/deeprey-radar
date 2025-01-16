@@ -199,6 +199,11 @@ void RadarPanel::ShowFrame(bool visible) {
     LOG_DIALOG(wxT("RadarPanel::ShowFrame: show_radar[%d]=%d"), m_ri->m_radar, 1);
   }
 
+
+  //pane.Show(false);
+ // m_aui_mgr->Update();
+  return;
+
   // What should have been a simple 'pane.Show(visible)' has devolved into a terrible hack.
   // When the entire dock row disappears because we're removing the last pane from it then the
   // next time we restore the dock gets its original size again. This is not want customers want.

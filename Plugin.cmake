@@ -85,6 +85,7 @@ set(GENERAL_HEADERS
     include/radar_pi.h
     include/shaderutil.h
     include/socketutil.h
+    include/DpRadarCommand.h
 )
 
 set(GENERAL_SOURCES
@@ -110,6 +111,7 @@ set(GENERAL_SOURCES
     src/radar_pi.cpp
     src/shaderutil.cpp
     src/socketutil.cpp
+    src/DpRadarCommand.cpp
 )
 
 # Fichiers .inc
@@ -267,7 +269,7 @@ source_group("" FILES ${SRC} ${HEADERS} ${INLINES})
 
 
 
-set(PKG_API_LIB api-16)  # ex. : un répertoire dans libs/ => api-16 ou api-17
+set(PKG_API_LIB api-19)  # ex. : un répertoire dans libs/ => api-16 ou api-17
 
 #
 # -------- Macros complémentaires --------
@@ -288,6 +290,10 @@ macro(late_init)
 endmacro()
 
 macro(add_plugin_libraries)
+  # Add libraries required by this plugin
+  add_subdirectory("${CMAKE_SOURCE_DIR}/opencpn-libs/plugin_dc")
+  target_link_libraries(${PACKAGE_NAME} ocpn::plugin-dc)
+  
   # Ajoute ici les librairies requises par votre plugin
   add_subdirectory("opencpn-libs/nmea0183")
   target_link_libraries(${PKG_NAME} ocpn::nmea0183)
