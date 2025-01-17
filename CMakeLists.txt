@@ -50,6 +50,16 @@ include_directories(
 					${CMAKE_SOURCE_DIR}/include/emulator
 )
 
+# Add the RadarBridge subdirectory so it is built
+add_subdirectory(RadarBridge)
+
+# Make sure radar_pi can see RadarBridge's include path if needed:
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/RadarBridge)
+
+# link the plugin target against the library
+target_link_libraries(${CMAKE_PROJECT_NAME} RadarBridge)
+
+
 add_subdirectory("opencpn-libs/${PKG_API_LIB}")
 if(${PKG_NAME} MATCHES wx32)
   target_link_libraries(${CMAKE_PROJECT_NAME} ocpn::api_wx32)

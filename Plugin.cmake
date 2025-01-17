@@ -85,6 +85,7 @@ set(GENERAL_HEADERS
     include/radar_pi.h
     include/shaderutil.h
     include/socketutil.h
+    include/RadarAPI.h
 )
 
 set(GENERAL_SOURCES
@@ -110,6 +111,7 @@ set(GENERAL_SOURCES
     src/radar_pi.cpp
     src/shaderutil.cpp
     src/socketutil.cpp
+    src/RadarAPI.cpp
 )
 
 # Fichiers .inc

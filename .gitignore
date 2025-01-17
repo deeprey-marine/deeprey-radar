@@ -10,3 +10,4 @@ cache
 plugins
 *.bat
 *.bak
+wxWidgets*7z
