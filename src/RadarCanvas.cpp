@@ -705,6 +705,14 @@ void RadarCanvas::Render(wxPaintEvent &evt) {
   glPopAttrib();
   glPopMatrix();
 
+
+  if (g_radarAPI) {
+    IRadarOverlay *overlay = g_radarAPI->GetOverlay();
+    if (overlay) {
+      overlay->OnRadarOverlayRender(m_context, &clientSize, radar_radius);
+    }
+  }
+
   // Do the swapbuffers first, before restoring the context. If we don't then various artifacts
   // occur on MacOS with the radar PPI window getting completely distorted.
   // Also it seems much more logical to call SwapBuffers() *before* going back to the OpenCPN
