@@ -53,6 +53,8 @@ int g_verbose;
 #undef M_SETTINGS
 #define M_SETTINGS m_settings
 
+ static RadarAPI s_radarAPI(nullptr);
+
 // the class factories, used to create and destroy instances of the PlugIn
 
 extern "C" DECL_EXP opencpn_plugin *create_pi(void *ppimgr) { return new radar_pi(ppimgr); }
@@ -386,6 +388,12 @@ int radar_pi::Init(void) {
   m_update_timer = new wxTimer(this, UPDATE_TIMER_ID);
   m_update_timer->Start(UPDATE_INTERVAL);
 
+  // Initialize the bridging API pointer:
+  // This ensures that any other plugin that also loads RadarBridge.so/dll
+  // can see the same pointer to the IRadarAPI instance.
+  s_radarAPI = RadarAPI(this);
+  g_radarAPI = &s_radarAPI;
+
   return PLUGIN_OPTIONS;
 }
 
@@ -491,6 +499,10 @@ bool radar_pi::DeInit(void) {
   if (m_GPS_filter) {
     delete m_GPS_filter;
     m_GPS_filter = 0;
+  }
+
+  if (g_radarAPI == &s_radarAPI) {
+    g_radarAPI = nullptr;
   }
 
   // No need to delete wxWindow stuff, wxWidgets does this for us.
