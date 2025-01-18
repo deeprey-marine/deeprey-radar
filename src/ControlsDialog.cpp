@@ -2496,6 +2496,7 @@ void ControlsDialog::UnHideTemporarily() {
 }
 
 void ControlsDialog::ShowDialog() {
+  return;
   m_hide = false;
   UnHideTemporarily();
   UpdateControlValues(true);

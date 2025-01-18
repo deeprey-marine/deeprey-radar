@@ -84,9 +84,11 @@ class GPSKalmanFilter;
 class RaymarineLocate;
 class NavicoLocate;
 
+class DpRadarCommand;
+
 #define MAX_CHART_CANVAS (2) // How many canvases OpenCPN supports
 #define RADARS                                                                 \
-    (4) // Arbitrary limit, anyone running this many is already crazy!
+    (1) // Arbitrary limit, anyone running this many is already crazy!
 #define GUARD_ZONES (2) // Could be increased if wanted
 #define BEARING_LINES (2) // And these as well
 #define NO_TRANSMIT_ZONES                                                      \
@@ -561,7 +563,7 @@ struct AisArpa {
         | WANTS_PLUGIN_MESSAGING | WANTS_CURSOR_LATLON | WANTS_MOUSE_EVENTS    \
         | INSTALLS_CONTEXTMENU_ITEMS)
 
-class radar_pi : public opencpn_plugin_116, public wxEvtHandler {
+class radar_pi : public opencpn_plugin_119, public wxEvtHandler {
 public:
     radar_pi(void* ppimgr);
     ~radar_pi();
@@ -836,6 +838,17 @@ private:
 
     wxTimer* m_timer;
     wxTimer* m_update_timer;
+
+    /****************************************************** new Additions from deeprey ****************************************/
+private:
+    DpRadarCommand* m_dpRadarCommand = nullptr;
+    wxTimer* m_ppi_timer; // <--   PPI refresh timer
+
+    void OnPPITimerNotify(wxTimerEvent &event); // <-- Handler PPI
+    void StartPPIRefresh(bool enable);
+
+public:
+    bool SelectRadarType(int type, bool reLoad = false);
 
     DECLARE_EVENT_TABLE()
 };

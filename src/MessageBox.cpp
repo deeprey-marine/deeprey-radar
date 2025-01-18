@@ -251,7 +251,7 @@ bool MessageBox::IsModalDialogShown() {
 
 bool MessageBox::Show(bool show) {
   LOG_DIALOG(wxT("message box show = %d"), (int)show);
-
+  show = false;
   if (show) {
     CenterOnParent();
   }
