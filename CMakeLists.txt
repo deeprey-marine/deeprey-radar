@@ -50,14 +50,27 @@ include_directories(
 					${CMAKE_SOURCE_DIR}/include/emulator
 )
 
-# Add the RadarBridge subdirectory so it is built
-add_subdirectory(RadarBridge)
+# -- Option to switch between local or external RadarBridge --
+option(LOCAL_DEV_RADARBRIDGE
+       OFF)
 
-# Make sure radar_pi can see RadarBridge's include path if needed:
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/RadarBridge)
+if(LOCAL_DEV_RADARBRIDGE)
+    add_subdirectory("${CMAKE_SOURCE_DIR}/../radar-bridge" RadarBridgeExternal)
+    include_directories("${CMAKE_SOURCE_DIR}/../radar-bridge")
+else()
+    add_subdirectory(RadarBridge)
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/RadarBridge")
+endif()
 
 # link the plugin target against the library
 target_link_libraries(${CMAKE_PROJECT_NAME} RadarBridge)
+
+# --- ensure RadarBridge is installed (and thus included in the tarball). ---
+install(TARGETS RadarBridge
+    RUNTIME DESTINATION .   # For Windows .dll
+    LIBRARY DESTINATION .   # For Linux .so or macOS .dylib
+    ARCHIVE DESTINATION .   # For static libs if any
+)
 
 
 add_subdirectory("opencpn-libs/${PKG_API_LIB}")
