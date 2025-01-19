@@ -31,6 +31,7 @@
 
 #include "RadarCanvas.h"
 
+#include "RadarAPI.h"
 #include "RadarInfo.h"
 #include "TextureFont.h"
 #include "drawutil.h"

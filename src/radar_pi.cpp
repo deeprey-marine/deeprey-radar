@@ -49,13 +49,15 @@
 #include "raymarine/RaymarineLocate.h"
 #include "DpRadarCommand.h"
 
+#include "RadarAPI.h"
+
 namespace RadarPlugin {
 using ::NMEA0183;
 int g_verbose;
 #undef M_SETTINGS
 #define M_SETTINGS m_settings
 
- static RadarAPI s_radarAPI(nullptr);
+ static RadarAPI* s_radarAPI(nullptr);
 
 // the class factories, used to create and destroy instances of the PlugIn
 
@@ -400,8 +402,12 @@ int radar_pi::Init(void) {
   // Initialize the bridging API pointer:
   // This ensures that any other plugin that also loads RadarBridge.so/dll
   // can see the same pointer to the IRadarAPI instance.
-  s_radarAPI = RadarAPI(this);
-  g_radarAPI = &s_radarAPI;
+  s_radarAPI = new RadarAPI(this);
+  g_radarAPI = s_radarAPI;
+
+  if (g_radarAPI) {
+    s_radarAPI->SendPongMessage();
+  }
 
   return PLUGIN_OPTIONS;
 }
@@ -521,7 +527,7 @@ bool radar_pi::DeInit(void) {
     m_GPS_filter = 0;
   }
 
-  if (g_radarAPI == &s_radarAPI) {
+  if (g_radarAPI == s_radarAPI) {
     g_radarAPI = nullptr;
   }
 
@@ -1993,7 +1999,7 @@ void radar_pi::UpdateCOGAvg(double cog) {
 
 void radar_pi::SetPluginMessage(wxString &message_id, wxString &message_body) {
 
-  if (m_dpRadarCommand && m_dpRadarCommand->ProcessMessage(message_id, message_body)) {
+  if (s_radarAPI && s_radarAPI->ProcessMessage(message_id, message_body)) {
       return;
   }
   static const wxString WMM_VARIATION_BOAT = wxString(_T("WMM_VARIATION_BOAT"));
@@ -2247,7 +2253,7 @@ bool radar_pi::IsRadarOnScreen(int radar) {
 }
 
 /**************************************************** Deeprey Plugin ***********************************************************************/
-bool radar_pi::SelectRadarType(int type, bool reLoad) {
+bool radar_pi::SelectRadarType(int type, bool reLoad) { 
 
 
   m_initialized = false;
