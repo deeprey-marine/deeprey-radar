@@ -67,6 +67,7 @@ RadarCanvas::RadarCanvas(radar_pi *pi, RadarInfo *ri, wxWindow *parent, wxSize s
 
 RadarCanvas::~RadarCanvas() {
   LOG_VERBOSE(wxT("%s destroy OpenGL canvas"), m_ri->m_name.c_str());
+  SetCurrent(*m_context);
   delete m_context;
   delete m_zero_context;
   if (m_cursor_texture) {
@@ -800,7 +801,16 @@ void RadarCanvas::OnMouseClickUp(wxMouseEvent &event) {
 }
 
 void RadarCanvas::OnMouseClickDown(wxMouseEvent &event) {
+  
   event.GetPosition(&m_mouse_down.x, &m_mouse_down.y);
+ if (g_radarAPI) {
+        IRadarOverlay* overlay = g_radarAPI->GetOverlay();
+        if (overlay) {
+            int mouseX = event.GetX();
+            int mouseY = event.GetY();
+            overlay->OnMouseClick(mouseX, mouseY);
+        }
+    }
   event.Skip();
 }
 

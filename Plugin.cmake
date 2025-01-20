@@ -62,17 +62,17 @@ set(GENERAL_HEADERS
     include/Matrix.h
     include/MessageBox.h
     include/OptionsDialog.h
-    include/RadarCanvas.h
+#    include/RadarCanvas.h
     include/RadarControl.h
     include/RadarControlItem.h
     include/RadarDraw.h
     include/RadarDrawShader.h
     include/RadarDrawVertex.h
     include/RadarFactory.h
-    include/RadarInfo.h
+#    include/RadarInfo.h
     include/RadarLocationInfo.h
     include/Arpa.h
-    include/RadarPanel.h
+#    include/RadarPanel.h
     include/RadarReceive.h
     include/RadarType.h
     include/SelectDialog.h
@@ -82,11 +82,11 @@ set(GENERAL_HEADERS
     include/drawutil.h
     include/icons.h
     include/pi_common.h
-    include/radar_pi.h
+#    include/radar_pi.h
     include/shaderutil.h
     include/socketutil.h
-    include/RadarAPI.h
-    include/DpRadarCommand.h
+#    include/RadarAPI.h
+#   include/DpRadarCommand.h
 )
 
 set(GENERAL_SOURCES
@@ -96,24 +96,24 @@ set(GENERAL_SOURCES
     src/Kalman.cpp
     src/MessageBox.cpp
     src/OptionsDialog.cpp
-    src/RadarCanvas.cpp
+#    src/RadarCanvas.cpp
     src/RadarDraw.cpp
     src/RadarDrawShader.cpp
     src/RadarDrawVertex.cpp
     src/RadarFactory.cpp
-    src/RadarInfo.cpp
+#    src/RadarInfo.cpp
     src/Arpa.cpp
-    src/RadarPanel.cpp
+#    src/RadarPanel.cpp
     src/SelectDialog.cpp
     src/TextureFont.cpp
     src/TrailBuffer.cpp
     src/drawutil.cpp
     src/icons.cpp
-    src/radar_pi.cpp
+#    src/radar_pi.cpp
     src/shaderutil.cpp
     src/socketutil.cpp
-    src/RadarAPI.cpp
-    src/DpRadarCommand.cpp
+#    src/RadarAPI.cpp
+#    src/DpRadarCommand.cpp
 )
 
 # Fichiers .inc
@@ -210,6 +210,28 @@ set(RAYMARINE_SOURCES
     src/raymarine/RMQuantumControlsDialog.cpp
 )
 
+
+#
+# === 1) Définir la liste de vos fichiers "importants" ===
+#
+set(IMPORTANT_HEADERS
+    include/RadarPanel.h
+    include/radar_pi.h
+    include/RadarInfo.h
+    include/RadarCanvas.h
+    include/RadarAPI.h
+    include/DpRadarCommand.h
+)
+
+set(IMPORTANT_SOURCES
+    src/RadarPanel.cpp
+    src/radar_pi.cpp
+    src/RadarInfo.cpp
+    src/RadarCanvas.cpp
+    src/RadarAPI.cpp
+    src/DpRadarCommand.cpp
+)
+
 #
 # -------- Groups (filtres) Visual Studio --------
 #
@@ -218,6 +240,10 @@ set(RAYMARINE_SOURCES
 source_group("General\\Headers" FILES ${GENERAL_HEADERS})
 source_group("General\\Sources" FILES ${GENERAL_SOURCES})
 source_group("General\\Inline"  FILES ${INLINE_INCLUDES})
+
+# Important
+source_group("Important\\Headers" FILES ${IMPORTANT_HEADERS})
+source_group("Important\\Sources" FILES ${IMPORTANT_SOURCES})
 
 # Emulator
 source_group("Emulator\\Headers" FILES ${EMULATOR_HEADERS})
@@ -239,11 +265,14 @@ source_group("Navico\\Sources" FILES ${NAVICO_SOURCES})
 source_group("Raymarine\\Headers" FILES ${RAYMARINE_HEADERS})
 source_group("Raymarine\\Sources" FILES ${RAYMARINE_SOURCES})
 
+
+
 #
 # -------- Listes globales (pour usage en amont) --------
 #
 set(SRC
     ${GENERAL_SOURCES}
+    ${IMPORTANT_SOURCES}
     ${EMULATOR_SOURCES}
     ${GARMINHD_SOURCES}
     ${GARMINXHD_SOURCES}
@@ -253,6 +282,7 @@ set(SRC
 
 set(HEADERS
     ${GENERAL_HEADERS}
+    ${IMPORTANT_HEADERS}
     ${EMULATOR_HEADERS}
     ${GARMINHD_HEADERS}
     ${GARMINXHD_HEADERS}
