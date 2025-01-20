@@ -129,6 +129,7 @@ void RadarCanvas::RenderTexts(const wxSize &loc) {
   m_menu_size.x = x + 2 * (MENU_BORDER + MENU_EXTRA_WIDTH);
   m_menu_size.y = y + 2 * (MENU_BORDER);
 
+  /*
   if (state != RADAR_OFF) {
     glColor4ub(40, 40, 100, 128);
 
@@ -157,6 +158,7 @@ void RadarCanvas::RenderTexts(const wxSize &loc) {
     m_FontMenuBold.RenderString(s, loc.GetWidth() / 2 - m_zoom_size.x / 2 + MENU_BORDER,
                                 loc.GetHeight() - m_zoom_size.y + MENU_BORDER);
   }
+  */
 
   glColor4ub(200, 255, 200, 255);
   s = m_ri->GetCanvasTextTopLeft();
