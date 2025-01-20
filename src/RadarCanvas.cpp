@@ -67,6 +67,7 @@ RadarCanvas::RadarCanvas(radar_pi *pi, RadarInfo *ri, wxWindow *parent, wxSize s
 
 RadarCanvas::~RadarCanvas() {
   LOG_VERBOSE(wxT("%s destroy OpenGL canvas"), m_ri->m_name.c_str());
+  SetCurrent(*m_context);
   delete m_context;
   delete m_zero_context;
   if (m_cursor_texture) {
