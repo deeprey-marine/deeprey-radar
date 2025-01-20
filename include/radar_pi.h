@@ -846,6 +846,7 @@ private:
 
     void OnPPITimerNotify(wxTimerEvent &event); // <-- Handler PPI
     void StartPPIRefresh(bool enable);
+    void EnablePPIRender();
 
 public:
     bool SelectRadarType(int type, bool reLoad = false);
