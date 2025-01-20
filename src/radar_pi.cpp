@@ -397,18 +397,19 @@ int radar_pi::Init(void) {
   m_update_timer = new wxTimer(this, UPDATE_TIMER_ID);
   m_update_timer->Start(UPDATE_INTERVAL);
   m_ppi_timer = new wxTimer(this, PPI_TIMER_ID);
-  StartPPIRefresh(true);
+  
 
   // Initialize the bridging API pointer:
   // This ensures that any other plugin that also loads RadarBridge.so/dll
   // can see the same pointer to the IRadarAPI instance.
   s_radarAPI = new RadarAPI(this);
   g_radarAPI = s_radarAPI;
-
+ 
   if (g_radarAPI) {
     s_radarAPI->SendPongMessage();
   }
 
+  StartPPIRefresh(true);
   return PLUGIN_OPTIONS;
 }
 
@@ -2315,7 +2316,7 @@ void radar_pi::StartPPIRefresh(bool enable)
     if (!m_ppi_timer) {
         return;
     }
-
+     
     if (enable) {
         m_ppi_timer->StartOnce(50);   
     } else {
@@ -2325,7 +2326,10 @@ void radar_pi::StartPPIRefresh(bool enable)
 
 void radar_pi::OnPPITimerNotify(wxTimerEvent &event)
 {
-   
+  if (!IsOpenGLEnabled()) {
+      EnablePPIRender();
+  }
+
     int drawTimePPI = 0;
     
     // Parcours de tous les radars
@@ -2358,6 +2362,19 @@ void radar_pi::OnPPITimerNotify(wxTimerEvent &event)
     }
     
 }
+
+
+void radar_pi::EnablePPIRender() {
+  wxWindow* chartCanvasWindow = GetOCPNCanvasWindow();
+
+  if (!GetOCPNCanvasWindow()->IsShownOnScreen()) {
+      chartCanvasWindow->Show();
+      chartCanvasWindow->Refresh();
+      chartCanvasWindow->Update();
+      chartCanvasWindow->Hide();
+  }
+
+} 
 
 
 }  // namespace RadarPlugin
