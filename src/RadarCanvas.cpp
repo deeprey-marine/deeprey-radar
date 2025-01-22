@@ -808,11 +808,9 @@ void RadarCanvas::OnMouseClickDown(wxMouseEvent &event) {
  if (g_radarAPI) {
         IRadarOverlay* overlay = g_radarAPI->GetOverlay();
         if (overlay) {
-            int mouseX = event.GetX();
-            int mouseY = event.GetY();
-            overlay->OnMouseClick(mouseX, mouseY);
+            overlay->OnMouseClick(event);
         }
-    }
+ }
   event.Skip();
 }
 
