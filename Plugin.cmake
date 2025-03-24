@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(radar_pi)
+project(deeprey-radar_pi)
 
 # Active l’affichage des dossiers dans Visual Studio
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -9,26 +9,27 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # -------- Options / Variables du plugin --------
 #
 set(OCPN_TEST_REPO
-    "opencpn-radar-pi/radar-unstable"
+    "deeprey-radar-pi/radar-unstable"
     CACHE STRING "Default repository for untagged builds"
 )
 set(OCPN_BETA_REPO
-    "opencpn-radar-pi/radar-beta"
+    "deeprey-radar-pi/radar-beta"
     CACHE STRING 
     "Default repository for tagged builds matching 'beta'"
 )
 set(OCPN_RELEASE_REPO
-    "opencpn-radar-pi/radar-prod"
+    "deeprey-radar-pi/radar-prod"
     CACHE STRING 
     "Default repository for tagged builds not matching 'beta'"
 )
 
-set(PKG_NAME       radar_pi)
-set(PKG_VERSION    5.5.5)
+# This project forked from OpenCPN radar_pi, Version 5.5.5
+set(PKG_NAME       deeprey-radar_pi)
+set(PKG_VERSION    0.1.0)
 set(PKG_PRERELEASE "")  # vide ou p. ex "beta"
 
-set(DISPLAY_NAME    "radar")
-set(PLUGIN_API_NAME "Radar")
+set(DISPLAY_NAME    "deeprey-radar")
+set(PLUGIN_API_NAME "Deepray-Radar")
 
 set(CPACK_PACKAGE_CONTACT "kees@verruijt.net")
 set(PKG_SUMMARY     "Overlays the radar picture on OpenCPN")
