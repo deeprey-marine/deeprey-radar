@@ -547,9 +547,9 @@ int radar_pi::GetPlugInVersionMinor() { return PLUGIN_VERSION_MINOR; }
 
 wxBitmap *radar_pi::GetPlugInBitmap() { return m_pdeficon; }
 
-wxString radar_pi::GetCommonName() { return wxT("Radar"); }
+wxString radar_pi::GetCommonName() { return wxT("Deeprey-Radar"); }
 
-wxString radar_pi::GetShortDescription() { return _("Radar PlugIn"); }
+wxString radar_pi::GetShortDescription() { return _("Deeprey Radar PlugIn"); }
 
 wxString radar_pi::GetLongDescription() {
   return _("Radar PlugIn with support for Garmin, Raymarine and Navico radars") + wxT("\n") + wxT(PLUGIN_VERSION_WITH_DATE);
