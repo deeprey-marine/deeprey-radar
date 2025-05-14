@@ -5,8 +5,9 @@
 #include <wx/jsonwriter.h>
 
 #include <unordered_map>
+#include "ControlType.h"
+
 class ControlInfo;
-enum ControlType;
 
 class radar_pi;
 
