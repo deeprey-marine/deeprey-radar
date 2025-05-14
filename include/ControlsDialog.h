@@ -37,6 +37,7 @@
 #define HAVE_CONTROL(a, b, c, d, e, f, g)
 #include "SoftwareControlSet.h"
 #undef HAVE_CONTROL
+#include "ControlInfo.h"
 
 PLUGIN_BEGIN_NAMESPACE
 
@@ -104,23 +105,7 @@ extern const string ControlTypeNames[CT_MAX];
 
 extern wxSize g_buttonSize;
 
-class ControlInfo {
-public:
-    ControlType type;
-    int autoValues;
-    wxString* autoNames;
-    bool hasOff;
-    bool hasAutoAdjustable;
-    int defaultValue;
-    int minValue;
-    int maxValue;
-    int minAdjustValue;
-    int maxAdjustValue;
-    int stepValue;
-    int nameCount;
-    wxString unit;
-    wxString* names;
-};
+
 
 //----------------------------------------------------------------------------------------------------------
 //    Radar Control Dialog Specification

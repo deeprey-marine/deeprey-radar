@@ -39,6 +39,7 @@
 #include <vector>
 
 #include "RadarControlItem.h"
+#include "ControlType.h"
 #include "RadarLocationInfo.h"
 #include "config.h"
 #include "drawutil.h"
@@ -305,13 +306,7 @@ const static int RadarOrder[RT_MAX] = {
 
 extern const wchar_t* RadarTypeName[RT_MAX];
 
-typedef enum ControlType {
-    CT_NONE,
-#define CONTROL_TYPE(x, y) x,
-#include "ControlType.inc"
-#undef CONTROL_TYPE
-    CT_MAX
-} ControlType;
+
 
 // We used to use wxColour(), but its implementation is surprisingly
 // complicated in some ports of wxWidgets, in particular wxMAC, so

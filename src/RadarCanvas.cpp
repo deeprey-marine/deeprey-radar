@@ -50,6 +50,8 @@ END_EVENT_TABLE()
 
 static int attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, WX_GL_STENCIL_SIZE, 8, 0};
 
+extern RadarAPI *g_radarAPI;
+
 RadarCanvas::RadarCanvas(radar_pi *pi, RadarInfo *ri, wxWindow *parent, wxSize size)
     : wxGLCanvas(parent, wxID_ANY, attribs, wxDefaultPosition, size, wxFULL_REPAINT_ON_RESIZE | wxBG_STYLE_CUSTOM, _T("")) {
   m_parent = parent;

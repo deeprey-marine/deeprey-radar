@@ -220,6 +220,95 @@ RadarInfo::~RadarInfo() {
   }
 }
 
+void RadarInfo::InitControlInfo(ControlType ct, int autoValues, wxString auto_names[], int defaultValue, int minValue, int maxValue,
+                   int stepValue, int nameCount, wxString names[]) {
+  m_ctrl[ct].type = ct;
+  if (defaultValue == CTD_DEF_OFF) {
+    m_ctrl[ct].hasOff = true;
+    defaultValue = CTD_DEF_ZERO;
+  }
+  m_ctrl[ct].defaultValue = defaultValue;
+  m_ctrl[ct].minValue = minValue;
+  m_ctrl[ct].maxValue = maxValue;
+  m_ctrl[ct].stepValue = stepValue;
+  m_ctrl[ct].nameCount = nameCount;
+
+  // To simplify the macros a control without autovalues passes in
+  // CTD_AUTO_NO, which is an array of 1 with length zero.
+  if (autoValues == 1 && auto_names[0].length() == 0) {
+    autoValues = 0;
+    m_ctrl[ct].autoNames = 0;
+  }
+  m_ctrl[ct].autoValues = autoValues;
+
+  if (autoValues > 0) {
+    m_ctrl[ct].autoNames = new wxString[autoValues];
+    for (int i = 0; i < autoValues; i++) {
+      m_ctrl[ct].autoNames[i] = auto_names[i];
+    }
+  }
+
+  if (nameCount == 1 && names[0].length() > 0) {
+    m_ctrl[ct].unit = names[0];
+  } else if (nameCount > 0 && names[0].length() > 0) {
+    m_ctrl[ct].names = new wxString[nameCount];
+    for (int i = 0; i < nameCount; i++) {
+      m_ctrl[ct].names[i] = names[i];
+    }
+  }
+}
+
+void RadarInfo::InitControlsInfo() {
+  for (size_t i = 0; i < ARRAY_SIZE(m_ctrl); i++) {
+    m_ctrl[i].type = CT_NONE;
+    m_ctrl[i].names = 0;
+    m_ctrl[i].autoNames = 0;
+    m_ctrl[i].hasOff = false;
+    m_ctrl[i].hasAutoAdjustable = false;
+  }
+
+#define HAVE_CONTROL(a, b, c, d, e, f, g) \
+  wxString a##_auto_names[] = b;          \
+  wxString a##_names[] = g;               \
+  InitControlInfo(a, ARRAY_SIZE(a##_auto_names), a##_auto_names, c, d, e, f, ARRAY_SIZE(a##_names), a##_names);
+
+  int radarType = m_radar_type;
+  switch (m_radar_type) {
+    case RT_EMULATOR: {
+#include "emulator/EmulatorControlSet.h"
+    } break;
+    case RT_GARMIN_HD: {
+#include "garminhd/GarminHDControlSet.h"
+    } break;
+    case RT_GARMIN_XHD: {
+#include "garminxhd/GarminxHDControlSet.h"
+    } break;
+        // Navico sub types
+    case RT_BR24:
+    case RT_3G: 
+    case RT_4GA:
+    case RT_4GB:
+    case RT_HaloA:
+    case RT_HaloB:
+    {      
+#include "navico/NavicoControlSet.h"
+      if (radarType >= RT_HaloA) {
+        m_ctrl[CT_SEA].hasAutoAdjustable = true;
+        m_ctrl[CT_SEA].minAdjustValue = -50;
+        m_ctrl[CT_SEA].maxAdjustValue = +50;
+      }
+    } break;   
+    case RM_E120: {
+#include "raymarine/RME120ControlSet.h"
+    } break;
+    case RM_QUANTUM: {
+#include "raymarine/RMQuantumControlSet.h"
+    } break;
+  }
+
+  #undef HAVE_CONTROL
+}
+
 /**
  * Initialize the on-screen and receive/transmit items.
  *
@@ -230,6 +319,7 @@ RadarInfo::~RadarInfo() {
 bool RadarInfo::Init() {
   m_verbose = M_SETTINGS.verbose;
   m_name = RadarTypeName[m_radar_type];
+  InitControlsInfo();
   m_spokes = RadarSpokes[m_radar_type];
   m_spoke_len_max = RadarSpokeLenMax[m_radar_type];
   m_history = (line_history *)calloc(sizeof(line_history), m_spokes);

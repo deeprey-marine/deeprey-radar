@@ -75,6 +75,7 @@ public:
     radar_pi* m_pi; // Pointer back to the plugin
     size_t m_radar; // Which radar this is [0..RADARS>
     RadarType m_radar_type; // Which radar type
+    ControlInfo m_ctrl[CT_MAX]; 
     size_t m_spokes; // # of spokes per rotation
     size_t m_spoke_len_max; // Max # of bytes per spoke
     size_t m_no_transmit_zones;
@@ -230,7 +231,7 @@ public:
     RadarInfo(radar_pi* pi, int radar);
     ~RadarInfo();
 
-    bool Init();
+    bool Init();    
     void SetName(wxString name);
     wxString GetInfoStatus();
 
@@ -360,6 +361,11 @@ private:
         DrawInfo* di, double radar_scale, double panel_rotate);
     wxString FormatDistance(double distance);
     wxString FormatAngle(double angle);
+    void InitControlsInfo();
+    void InitControlInfo(ControlType ct, int autoValues, wxString auto_names[],
+        int defaultValue, int minValue, int maxValue, int stepValue,
+        int nameCount, wxString names[]);
+
 
     int m_previous_auto_range_meters;
 

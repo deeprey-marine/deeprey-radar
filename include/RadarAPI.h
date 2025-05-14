@@ -1,43 +1,64 @@
 #pragma once
-#include "RadarBridge.h" // so we know about IRadarAPI, etc.
 
 #include <wx/jsonreader.h>
 #include <wx/jsonval.h>
 #include <wx/jsonwriter.h>
 
 #include <unordered_map>
+class ControlInfo;
+enum ControlType;
 
 class radar_pi;
 
-PLUGIN_BEGIN_NAMESPACE
+class wxGLContext; // treat them as incomplete types
+class wxSize;
+class wxString;
+class wxVariant;
+class wxMouseEvent;
 
-class RadarAPI : public IRadarAPI {
+namespace RadarPlugin {
+
+/**
+ * Interface for a plugin wanting to draw on the radar's OpenGL canvas.
+ * The radar plugin calls OnRadarOverlayRender(...) during its GL draw cycle.
+ *
+ * We only pass pointers to wxGLContext and wxSize. We do NOT call their
+ * methods, so we don't need the actual wxWidgets definitions here.
+ */
+struct IRadarOverlay {
+    virtual ~IRadarOverlay() { }
+
+    virtual void OnRadarOverlayRender(
+        wxGLContext* pcontext, const wxSize* canvasSize, float radarRangePx)
+        = 0;
+
+    // NEW: Called to handle mouse clicks in the radar overlay
+    virtual void OnMouseClick(wxMouseEvent& event) = 0;
+};
+
+class RadarAPI {
 public:
     RadarAPI(radar_pi* radarPlugin);
     virtual ~RadarAPI();
 
-    virtual bool SetControl(const wxString& controlName, const wxVariant& value) override;
-    virtual wxVariant GetControl(const wxString& controlName) override;
+    virtual bool SetControl(ControlType controlType, const wxVariant& value, int controlIndex = 0);
+    virtual wxVariant GetControl(ControlType controlType, int controlIndex = 0);
 
-    virtual bool Transmit(bool enable) override;
+    virtual bool Transmit(bool enable);
 
     // IRadarAPI interface:
-    virtual void SetRadarRangeNM(double range_nm) override;
-    virtual double GetRadarRangeNM() const override;
+    virtual void SetRadarRangeNM(double range_nm);
+    virtual double GetRadarRangeNM() const;
 
-    virtual void SetGain(int gain) override;
-    virtual int GetGain() const override;
-
-    virtual void RegisterOverlayRenderer(IRadarOverlay* overlay) override;
-    virtual void UnregisterOverlayRenderer(IRadarOverlay* overlay) override;
+    virtual void RegisterOverlayRenderer(IRadarOverlay* overlay);
+    virtual void UnregisterOverlayRenderer(IRadarOverlay* overlay);
     /************************************************/
 
-    virtual bool SelectRadarType(int type) override;
+    virtual bool SelectRadarType(int type);
+
+    virtual ControlInfo* GetRadarControls();
 
     IRadarOverlay* GetOverlay() const { return m_overlay; }
-
-    const std::unordered_map<wxString, ControlType>& GetControlTypeMap();
-    ControlType StringToControlType(const wxString& controlTypeStr);
 
     bool ProcessMessage(const wxString &message_id, const wxString &message_body);
 
@@ -52,4 +73,4 @@ private:
     IRadarOverlay* m_overlay; // single overlay pointer
 };
 
-PLUGIN_END_NAMESPACE
+}

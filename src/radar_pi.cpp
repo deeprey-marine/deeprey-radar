@@ -65,6 +65,8 @@ extern "C" DECL_EXP opencpn_plugin *create_pi(void *ppimgr) { return new radar_p
 
 extern "C" DECL_EXP void destroy_pi(opencpn_plugin *p) { delete p; }
 
+RadarAPI *g_radarAPI = nullptr;
+
 /********************************************************************************************************/
 //   Distance measurement for simple sphere
 /********************************************************************************************************/

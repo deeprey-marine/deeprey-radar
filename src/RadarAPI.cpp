@@ -17,10 +17,10 @@ RadarAPI::~RadarAPI() {
 }
 
 
-bool RadarAPI::SetControl(const wxString& controlName, const wxVariant& value) {
+bool RadarAPI::SetControl(ControlType controlType, const wxVariant& value, int controlIndex) {
 
 
-  switch (StringToControlType(controlName)) {
+  switch (controlType) {
 
     case CT_RANGE: {
       int rangeMeters = value.GetInteger();
@@ -38,22 +38,18 @@ bool RadarAPI::SetControl(const wxString& controlName, const wxVariant& value) {
     }
 
     case CT_OVERLAY_CANVAS: {
-      int val = value.GetBool();
-      if (controlName == "overlayCanvas_0") {
-          m_pi->m_radar[0]->m_overlay_canvas[0].Update(val);
-      } else if (controlName == "overlayCanvas_1") {
-          m_pi->m_radar[0]->m_overlay_canvas[1].Update(val);
-      }
+      int val = value.GetBool();   
+      m_pi->m_radar[0]->m_overlay_canvas[controlIndex].Update(val);    
       break;
     }
 
     case CT_GAIN: {
-      int gainPercent = value.GetInteger();
-      if (gainPercent < m_pi->m_radar[0]->m_gain.GetMin())
-        gainPercent = m_pi->m_radar[0]->m_gain.GetMin();
-      if (gainPercent > m_pi->m_radar[0]->m_gain.GetMax())
-        gainPercent = m_pi->m_radar[0]->m_gain.GetMax();
-      m_pi->m_radar[0]->m_gain.Update(gainPercent, RCS_MANUAL);
+      int iValue = value.GetInteger();
+      ControlInfo& ci = m_pi->m_radar[0]->m_ctrl[controlType];
+
+      if (iValue < ci.minValue) iValue = ci.minValue;
+      if (iValue > ci.maxValue) iValue = ci.maxValue;
+      m_pi->m_radar[0]->m_gain.Update(iValue, RCS_MANUAL);
       m_pi->m_radar[0]->SetControlValue(CT_GAIN, m_pi->m_radar[0]->m_gain, nullptr);
       break;
     }
@@ -63,21 +59,16 @@ bool RadarAPI::SetControl(const wxString& controlName, const wxVariant& value) {
   return true;
 }
 
-wxVariant RadarAPI::GetControl(const wxString& controlName)  {
+wxVariant RadarAPI::GetControl(ControlType controlType, int controlIndex) {
 
-    switch (StringToControlType(controlName)) {
+    switch (controlType) {
 
       case CT_RANGE: {
         return m_pi->m_radar[0]->m_range.GetValue();
       }
 
       case CT_OVERLAY_CANVAS: {
-        if (controlName == "overlayCanvas_0") {
-          return m_pi->m_radar[0]->m_overlay_canvas[0].GetValue();
-        } else if (controlName == "overlayCanvas_1") {
-          return m_pi->m_radar[0]->m_overlay_canvas[1].GetValue();
-        }
-        
+          return m_pi->m_radar[0]->m_overlay_canvas[controlIndex].GetValue();        
       }
 
       case CT_GAIN: {
@@ -111,16 +102,6 @@ bool RadarAPI::Transmit(bool enable) {
 
 double RadarAPI::GetRadarRangeNM() const {
   return m_pi->m_radar[0]->m_range.GetValue();
-}
-
-void RadarAPI::SetGain(int gain) {
-  // Some code to update actual hardware gain
-}
-
-int RadarAPI::GetGain() const {
-  // return the radar gain 
-
-  return m_pi->m_radar[0]->m_gain.GetValue();
 }
 
 void RadarAPI::RegisterOverlayRenderer(IRadarOverlay* overlay) { m_overlay = overlay; }
@@ -188,84 +169,10 @@ bool RadarAPI::SelectRadarType(int type) {
   return m_pi->SelectRadarType(type);
 }
 
+ControlInfo* RadarAPI::GetRadarControls() { return m_pi->m_radar[0]->m_ctrl; }
+
 void RadarAPI::SendPongMessage() {
-  SendMessageToDp({{"type", "pong"}});
-}
-
-
-
-ControlType RadarAPI::StringToControlType(const wxString& controlTypeStr) {
-  const auto& controlTypeMap = GetControlTypeMap();
-  auto it = controlTypeMap.find(controlTypeStr);
-  if (it != controlTypeMap.end()) {
-    return it->second;
-  }
-  return ControlType::CT_MAX;
-}
-
-const std::unordered_map<wxString, ControlType>& RadarAPI::GetControlTypeMap() {
-  static const std::unordered_map<wxString, ControlType> controlTypeMap = {
-    // Software
-    {wxT("antennaForward"),            ControlType::CT_ANTENNA_FORWARD},
-    {wxT("antennaStarboard"),          ControlType::CT_ANTENNA_STARBOARD},
-    {wxT("mainBangSize"),              ControlType::CT_MAIN_BANG_SIZE},
-    {wxT("orientation"),               ControlType::CT_ORIENTATION},
-    {wxT("centerView"),                ControlType::CT_CENTER_VIEW},
-    {wxT("overlayCanvas_0"),           ControlType::CT_OVERLAY_CANVAS},
-    {wxT("overlayCanvas_1"),           ControlType::CT_OVERLAY_CANVAS},
-    {wxT("targetOnPPI"),               ControlType::CT_TARGET_ON_PPI},
-    {wxT("refreshRate"),               ControlType::CT_REFRESHRATE},
-    {wxT("targetTrails"),              ControlType::CT_TARGET_TRAILS},
-    {wxT("threshold"),                 ControlType::CT_THRESHOLD},
-    {wxT("timedIdle"),                 ControlType::CT_TIMED_IDLE},
-    {wxT("timedRun"),                  ControlType::CT_TIMED_RUN},
-    {wxT("trailsMotion"),              ControlType::CT_TRAILS_MOTION},
-
-    // Hardware
-    {wxT("accentLight"),               ControlType::CT_ACCENT_LIGHT},
-    {wxT("antennaHeight"),             ControlType::CT_ANTENNA_HEIGHT},
-    {wxT("bearingAlignment"),          ControlType::CT_BEARING_ALIGNMENT},
-    {wxT("gain"),                      ControlType::CT_GAIN},
-    {wxT("interferenceRejection"),     ControlType::CT_INTERFERENCE_REJECTION},
-    {wxT("localInterferenceRejection"),ControlType::CT_LOCAL_INTERFERENCE_REJECTION},
-    {wxT("noiseRejection"),            ControlType::CT_NOISE_REJECTION},
-    {wxT("noTransmitStart1"),          ControlType::CT_NO_TRANSMIT_START_1},
-    {wxT("noTransmitStart2"),          ControlType::CT_NO_TRANSMIT_START_2},
-    {wxT("noTransmitStart3"),          ControlType::CT_NO_TRANSMIT_START_3},
-    {wxT("noTransmitStart4"),          ControlType::CT_NO_TRANSMIT_START_4},
-    {wxT("noTransmitEnd1"),            ControlType::CT_NO_TRANSMIT_END_1},
-    {wxT("noTransmitEnd2"),            ControlType::CT_NO_TRANSMIT_END_2},
-    {wxT("noTransmitEnd3"),            ControlType::CT_NO_TRANSMIT_END_3},
-    {wxT("noTransmitEnd4"),            ControlType::CT_NO_TRANSMIT_END_4},
-    {wxT("rain"),                      ControlType::CT_RAIN},
-    {wxT("range"),                     ControlType::CT_RANGE},
-    {wxT("scanSpeed"),                 ControlType::CT_SCAN_SPEED},
-    {wxT("sea"),                       ControlType::CT_SEA},
-    {wxT("seaState"),                  ControlType::CT_SEA_STATE},
-    {wxT("ftc"),                       ControlType::CT_FTC},
-    {wxT("mode"),                      ControlType::CT_MODE},
-    {wxT("allToAuto"),                 ControlType::CT_ALL_TO_AUTO},
-    {wxT("sideLobeSuppression"),       ControlType::CT_SIDE_LOBE_SUPPRESSION},
-    {wxT("targetBoost"),               ControlType::CT_TARGET_BOOST},
-    {wxT("targetExpansion"),           ControlType::CT_TARGET_EXPANSION},
-    {wxT("targetSeparation"),          ControlType::CT_TARGET_SEPARATION},
-    {wxT("transparency"),              ControlType::CT_TRANSPARENCY},
-    {wxT("doppler"),                   ControlType::CT_DOPPLER},
-    {wxT("dopplerThreshold"),          ControlType::CT_DOPPLER_THRESHOLD},
-    {wxT("dopplerAutoTrack"),          ControlType::CT_AUTOTTRACKDOPPLER},
-
-    // Raymarine
-    {wxT("stc"),                       ControlType::CT_STC},
-    {wxT("tuneFine"),                  ControlType::CT_TUNE_FINE},
-    {wxT("tuneCoarse"),                ControlType::CT_TUNE_COARSE},
-    {wxT("stcCurve"),                  ControlType::CT_STC_CURVE},
-    {wxT("displayTiming"),             ControlType::CT_DISPLAY_TIMING},
-    {wxT("mainBangSuppression"),       ControlType::CT_MAIN_BANG_SUPPRESSION},
-    {wxT("colorGain"),                 ControlType::CT_COLOR_GAIN},
-    {wxT("rangeAdjustment"),           ControlType::CT_RANGE_ADJUSTMENT}
-  };
-
-  return controlTypeMap;
+  SendMessageToDp({{"type", "pong"}, {"api", (long)this}});
 }
 
 

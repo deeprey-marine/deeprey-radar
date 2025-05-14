@@ -56,6 +56,8 @@ set(PKG_INFO_URL       "https://opencpn.org/OpenCPN/plugins/radarPI.html")
 
 # 1) Général
 set(GENERAL_HEADERS
+    include/ControlType.h
+    include/ControlInfo.h
     include/ControlsDialog.h
     include/GuardZone.h
     include/GuardZoneBogey.h
