@@ -147,6 +147,8 @@ void RadarAPI::SendMessageToDp(std::initializer_list<std::pair<const wxString, w
       root[key] = val.GetBool();
     } else if (val.GetType() == "long") {
       root[key] = (int)val.GetLong();
+    } else if (val.GetType() == "ulonglong") {
+      root[key] = val.GetULongLong().GetValue();
     } else if (val.GetType() == "double") {
       root[key] = val.GetDouble();
     } else if (val.GetType() == "string") {
@@ -172,7 +174,7 @@ bool RadarAPI::SelectRadarType(int type) {
 ControlInfo* RadarAPI::GetRadarControls() { return m_pi->m_radar[0]->m_ctrl; }
 
 void RadarAPI::SendPongMessage() {
-  SendMessageToDp({{"type", "pong"}, {"api", (long)this}});
+  SendMessageToDp({{"type", "pong"}, {"api", wxULongLong((wxULongLong_t)this)}});
 }
 
 
