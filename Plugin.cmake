@@ -68,6 +68,7 @@ set(GENERAL_HEADERS
 #    include/RadarCanvas.h
     include/RadarControl.h
     include/RadarControlItem.h
+    include/RadarControlState.h
     include/RadarDraw.h
     include/RadarDrawShader.h
     include/RadarDrawVertex.h
@@ -77,6 +78,7 @@ set(GENERAL_HEADERS
     include/Arpa.h
 #    include/RadarPanel.h
     include/RadarReceive.h
+    include/RadarState.h
     include/RadarType.h
     include/SelectDialog.h
     include/SoftwareControlSet.h

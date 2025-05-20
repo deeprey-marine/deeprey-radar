@@ -33,6 +33,7 @@
 #define _RADAR_CONTROL_ITEM_H_
 
 #include "pi_common.h"
+#include "RadarControlState.h"
 
 PLUGIN_BEGIN_NAMESPACE
 
@@ -45,19 +46,7 @@ class radar_pi;
 // Some controls are always only just a value.
 // Some other controls have state as well.
 
-enum RadarControlState {
-    RCS_OFF = -1,
-    RCS_MANUAL = 0,
-    RCS_AUTO_1,
-    RCS_AUTO_2,
-    RCS_AUTO_3,
-    RCS_AUTO_4,
-    RCS_AUTO_5,
-    RCS_AUTO_6,
-    RCS_AUTO_7,
-    RCS_AUTO_8,
-    RCS_AUTO_9
-};
+
 
 class RadarControlItem {
 public:

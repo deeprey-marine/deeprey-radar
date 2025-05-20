@@ -6,6 +6,8 @@
 
 #include <unordered_map>
 #include "ControlType.h"
+#include "RadarState.h"
+#include "RadarControlState.h"
 
 class ControlInfo;
 
@@ -43,9 +45,11 @@ public:
     virtual ~RadarAPI();
 
     virtual bool SetControl(ControlType controlType, const wxVariant& value, int controlIndex = 0);
-    virtual wxVariant GetControl(ControlType controlType, int controlIndex = 0);
+    virtual bool GetControl(ControlType controlType, int* value, RadarControlState* state, int controlIndex = 0);
+    virtual int GetControl(ControlType controlType, int controlIndex = 0);
 
     virtual bool Transmit(bool enable);
+    virtual RadarState GetRadarState();
 
     // IRadarAPI interface:
     virtual void SetRadarRangeNM(double range_nm);

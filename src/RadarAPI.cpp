@@ -59,24 +59,32 @@ bool RadarAPI::SetControl(ControlType controlType, const wxVariant& value, int c
   return true;
 }
 
-wxVariant RadarAPI::GetControl(ControlType controlType, int controlIndex) {
+bool RadarAPI::GetControl(ControlType controlType, int* value, RadarControlState* state, int controlIndex) {
 
+    RadarControlItem* item = nullptr;
     switch (controlType) {
 
       case CT_RANGE: {
-        return m_pi->m_radar[0]->m_range.GetValue();
-      }
+        item = &m_pi->m_radar[0]->m_range;
+      } break;
 
       case CT_OVERLAY_CANVAS: {
-          return m_pi->m_radar[0]->m_overlay_canvas[controlIndex].GetValue();        
-      }
+        item = &m_pi->m_radar[0]->m_overlay_canvas[controlIndex];        
+      } break;
 
       case CT_GAIN: {
-        return m_pi->m_radar[0]->m_gain.GetValue();
-      }
+        item = &m_pi->m_radar[0]->m_gain;
+      } break;
     }
 
-  return wxVariant();
+    return item ? item->GetButton(value, state) : false;
+}
+
+int RadarAPI::GetControl(ControlType controlType, int controlIndex)
+{
+  int value;
+  GetControl(controlType, &value, nullptr, controlIndex);
+  return value;
 }
 
 void RadarAPI::SetRadarRangeNM(double range_nm) {
@@ -177,5 +185,6 @@ void RadarAPI::SendPongMessage() {
   SendMessageToDp({{"type", "pong"}, {"api", wxULongLong((wxULongLong_t)this)}});
 }
 
+RadarState RadarAPI::GetRadarState() { return (RadarState)m_pi->m_radar[0]->m_state.GetButton(); }
 
 PLUGIN_END_NAMESPACE
