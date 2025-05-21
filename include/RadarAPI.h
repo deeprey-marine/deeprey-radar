@@ -10,6 +10,7 @@
 #include "RadarControlState.h"
 
 class ControlInfo;
+class RadarControlItem;
 
 class radar_pi;
 
@@ -44,7 +45,9 @@ public:
     RadarAPI(radar_pi* radarPlugin);
     virtual ~RadarAPI();
 
-    virtual bool SetControl(ControlType controlType, const wxVariant& value, int controlIndex = 0);
+    virtual void SetControlState(ControlType controlType, RadarControlState state);    
+    virtual bool SetControl(ControlType controlType, int value, int controlIndex = 0);
+    virtual void SetControlWithState(ControlType controlType, int value, RadarControlState state, int controlIndex = 0);
     virtual bool GetControl(ControlType controlType, int* value, RadarControlState* state, int controlIndex = 0);
     virtual int GetControl(ControlType controlType, int controlIndex = 0);
 
@@ -71,6 +74,8 @@ public:
 
 private:
 
+    RadarControlItem* GetControlItem(ControlType controlType, int controlIndex = 0);
+    void SetControl(ControlType controlType, int value, RadarControlItem& controlItem);
     void SendMessageToDp(std::initializer_list<std::pair<const wxString, wxVariant>> values);
     
     radar_pi* m_pi;

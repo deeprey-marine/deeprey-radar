@@ -17,13 +17,12 @@ RadarAPI::~RadarAPI() {
 }
 
 
-bool RadarAPI::SetControl(ControlType controlType, const wxVariant& value, int controlIndex) {
-
+bool RadarAPI::SetControl(ControlType controlType, int value, int controlIndex) {
 
   switch (controlType) {
 
     case CT_RANGE: {
-      int rangeMeters = value.GetInteger();
+      int rangeMeters = value;
       if (rangeMeters < m_pi->m_radar[0]->m_range.GetMin())
         rangeMeters = m_pi->m_radar[0]->m_range.GetMin();
       if (rangeMeters > m_pi->m_radar[0]->m_range.GetMax())
@@ -38,25 +37,67 @@ bool RadarAPI::SetControl(ControlType controlType, const wxVariant& value, int c
     }
 
     case CT_OVERLAY_CANVAS: {
-      int val = value.GetBool();   
-      m_pi->m_radar[0]->m_overlay_canvas[controlIndex].Update(val);    
+      m_pi->m_radar[0]->m_overlay_canvas[controlIndex].Update(value);    
       break;
     }
 
     case CT_GAIN: {
-      int iValue = value.GetInteger();
-      ControlInfo& ci = m_pi->m_radar[0]->m_ctrl[controlType];
-
-      if (iValue < ci.minValue) iValue = ci.minValue;
-      if (iValue > ci.maxValue) iValue = ci.maxValue;
-      m_pi->m_radar[0]->m_gain.Update(iValue, RCS_MANUAL);
-      m_pi->m_radar[0]->SetControlValue(CT_GAIN, m_pi->m_radar[0]->m_gain, nullptr);
+      SetControl(controlType, value, m_pi->m_radar[0]->m_gain);
+      break;
+    }
+    case CT_SEA:
+    {
+      SetControl(controlType, value, m_pi->m_radar[0]->m_sea);
       break;
     }
   }
 
 
   return true;
+}
+
+RadarControlItem* RadarAPI::GetControlItem(ControlType controlType, int controlIndex)
+{
+  RadarControlItem* result = nullptr;
+  switch (controlType) {
+    case CT_GAIN: {
+      result = &m_pi->m_radar[0]->m_gain;
+      break;
+    }
+    case CT_SEA: {
+      result = &m_pi->m_radar[0]->m_sea;
+      break;
+    }
+
+  }
+
+  return result;
+}
+
+void RadarAPI::SetControlWithState(ControlType controlType, int value, RadarControlState state, int controlIndex) {
+  RadarControlItem* controlItem = GetControlItem(controlType, controlIndex);
+  if (controlItem) {
+    controlItem->Update(value, state);
+    m_pi->m_radar[0]->SetControlValue(controlType, *controlItem, nullptr);
+  }
+}
+
+void RadarAPI::SetControlState(ControlType controlType, RadarControlState state) {
+  RadarControlItem* controlItem = GetControlItem(controlType);
+  if (controlItem)
+  {
+    controlItem->UpdateState(state);
+    m_pi->m_radar[0]->SetControlValue(controlType, *controlItem, nullptr);
+  }
+}
+
+void RadarAPI::SetControl(ControlType controlType, int value, RadarControlItem& controlItem) {
+  ControlInfo& ci = m_pi->m_radar[0]->m_ctrl[controlType];
+
+  if (value < ci.minValue) value = ci.minValue;
+  if (value > ci.maxValue) value = ci.maxValue;
+  controlItem.Update(value, RCS_MANUAL);
+  m_pi->m_radar[0]->SetControlValue(controlType, controlItem, nullptr);
 }
 
 bool RadarAPI::GetControl(ControlType controlType, int* value, RadarControlState* state, int controlIndex) {
@@ -74,6 +115,10 @@ bool RadarAPI::GetControl(ControlType controlType, int* value, RadarControlState
 
       case CT_GAIN: {
         item = &m_pi->m_radar[0]->m_gain;
+      } break;
+
+      case CT_SEA: {
+        item = &m_pi->m_radar[0]->m_sea;
       } break;
     }
 
