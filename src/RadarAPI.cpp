@@ -50,6 +50,10 @@ bool RadarAPI::SetControl(ControlType controlType, int value, int controlIndex) 
       SetControl(controlType, value, m_pi->m_radar[0]->m_sea);
       break;
     }
+    case CT_RAIN: {
+      SetControl(controlType, value, m_pi->m_radar[0]->m_rain);
+      break;
+    }
   }
 
 
@@ -68,7 +72,10 @@ RadarControlItem* RadarAPI::GetControlItem(ControlType controlType, int controlI
       result = &m_pi->m_radar[0]->m_sea;
       break;
     }
-
+    case CT_RAIN: {
+      result = &m_pi->m_radar[0]->m_rain;
+      break;
+    }
   }
 
   return result;
@@ -119,6 +126,9 @@ bool RadarAPI::GetControl(ControlType controlType, int* value, RadarControlState
 
       case CT_SEA: {
         item = &m_pi->m_radar[0]->m_sea;
+      } break;
+      case CT_RAIN: {
+        item = &m_pi->m_radar[0]->m_rain;
       } break;
     }
 
