@@ -76,6 +76,10 @@ RadarControlItem* RadarAPI::GetControlItem(ControlType controlType, int controlI
       result = &m_pi->m_radar[0]->m_rain;
       break;
     }
+    case CT_RANGE: {
+      result = &m_pi->m_radar[0]->m_range;
+      break;
+    }
   }
 
   return result;
@@ -241,5 +245,7 @@ void RadarAPI::SendPongMessage() {
 }
 
 RadarState RadarAPI::GetRadarState() { return (RadarState)m_pi->m_radar[0]->m_state.GetButton(); }
+
+void RadarAPI::AdjustRange(int adjustment) {  m_pi->m_radar[0]->AdjustRange(adjustment); }
 
 PLUGIN_END_NAMESPACE

@@ -50,6 +50,7 @@ public:
     virtual void SetControlWithState(ControlType controlType, int value, RadarControlState state, int controlIndex = 0);
     virtual bool GetControl(ControlType controlType, int* value, RadarControlState* state, int controlIndex = 0);
     virtual int GetControl(ControlType controlType, int controlIndex = 0);
+    virtual void AdjustRange(int adjustment);    
 
     virtual bool Transmit(bool enable);
     virtual RadarState GetRadarState();
