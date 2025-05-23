@@ -115,16 +115,12 @@ void RadarAPI::SetRadarRangeNM(double range_nm) {
   //}
 }
 
-bool RadarAPI::Transmit(bool enable) {
+void RadarAPI::Transmit(bool enable) {
   if (enable) {
     m_pi->m_radar[0]->RequestRadarState(RADAR_TRANSMIT);
   } else {
     m_pi->m_radar[0]->RequestRadarState(RADAR_STANDBY);
-  }
-
-  int state = m_pi->m_radar[0]->m_state.GetValue();
-
-  return state == RADAR_TRANSMIT;
+  }  
 }
 
 double RadarAPI::GetRadarRangeNM() const {

@@ -53,7 +53,7 @@ public:
     virtual void AdjustRange(int adjustment);   
     virtual bool HasHeadingSource();
 
-    virtual bool Transmit(bool enable);
+    virtual void Transmit(bool enable);
     virtual RadarState GetRadarState();
 
     // IRadarAPI interface:
