@@ -65,6 +65,7 @@ set(GENERAL_HEADERS
     include/Matrix.h
     include/MessageBox.h
     include/OptionsDialog.h
+    include/Orientation.h
 #    include/RadarCanvas.h
     include/RadarControl.h
     include/RadarControlItem.h

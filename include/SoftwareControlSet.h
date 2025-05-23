@@ -107,16 +107,8 @@
     { _("Head up"), _("Head up (Stabilized)"), _("North up"), _("Course up"),  \
         _("Unknown") }
 #endif
-// Orientation HEAD_UP is available if there is no heading or dev mode is
-// switched on Other orientations are available if there is a heading
-#define ORIENTATION_HEAD_UP                                                    \
-    (0) // Unstabilized heading (as if without compass) // Available if no
-        // compass or in dev mode
-#define ORIENTATION_STABILIZED_UP                                              \
-    (1) // Stabilized heading (averaged over a few seconds)
-#define ORIENTATION_NORTH_UP (2) // North up
-#define ORIENTATION_COG_UP (3) // Averaged GPS COG up (same way as OpenCPN)
-#define ORIENTATION_NUMBER (4)
+
+#include "Orientation.h"
 
 #ifndef VIEW_NAMES
 #define VIEW_NAMES                                                             \
@@ -152,6 +144,8 @@ HAVE_CONTROL(CT_MAIN_BANG_SIZE, CTD_AUTO_NO, CTD_DEF_ZERO, CTD_MIN_ZERO,
     CTD_MAX_100, CTD_STEP_1, CTD_NUMERIC)
 HAVE_CONTROL(CT_ORIENTATION, CTD_AUTO_NO, CTD_DEF_ZERO, CTD_MIN_ZERO,
     ORIENTATION_NUMBER - 1, CTD_STEP_1, ORIENTATION_NAMES)
+HAVE_CONTROL(CT_BEARING_RELATIVE, CTD_AUTO_NO, CTD_DEF_ZERO, CTD_MIN_ZERO,
+    1, CTD_STEP_1, OFF_ON_NAMES)
 HAVE_CONTROL(CT_CENTER_VIEW, CTD_AUTO_NO, CTD_DEF_ZERO, CTD_MIN_ZERO,
     ORIENTATION_NUMBER - 1, CTD_STEP_1, VIEW_NAMES)
 HAVE_CONTROL(CT_OVERLAY_CANVAS, CTD_AUTO_NO, CTD_DEF_ZERO, CTD_MIN_ZERO, 1,

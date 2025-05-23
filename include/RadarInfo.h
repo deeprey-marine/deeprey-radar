@@ -113,6 +113,7 @@ public:
     RadarControlItem
         m_boot_state; // Can contain RADAR_TRANSMIT until radar is seen at boot
     RadarControlItem m_orientation; // See below for allowed values.
+    RadarControlItem m_bearing_relative;
     RadarControlItem m_view_center;
 
     int m_min_contour_length; // minimum contour length of an ARPA or MARPA

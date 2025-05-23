@@ -1158,7 +1158,7 @@ wxString RadarInfo::GetCanvasTextTopLeft() {
 
   switch (GetOrientation()) {
     case ORIENTATION_HEAD_UP:
-      s << _("Head Up") << wxT("\n") << _("Relative Bearings");
+      s << _("Head Up");
       break;
     case ORIENTATION_STABILIZED_UP:
       s << _("Head Up") << wxT("\n") << _("Stabilized");
@@ -1173,6 +1173,8 @@ wxString RadarInfo::GetCanvasTextTopLeft() {
       s << _("Unknown");
       break;
   }
+  if (GetOrientation() == ORIENTATION_HEAD_UP || m_bearing_relative.GetValue())
+      s << wxT("\n") << _("Relative Bearings");
   if (m_range.GetValue() != 0) {
     s << wxT("\n") << GetRangeText();
   }
@@ -1230,7 +1232,7 @@ wxString RadarInfo::FormatAngle(double angle) {
 
   wxString relative;
   angle = MOD_DEGREES_FLOAT(angle);
-  if (GetOrientation() != ORIENTATION_HEAD_UP) {
+  if (GetOrientation() != ORIENTATION_HEAD_UP && !m_bearing_relative.GetValue()) {
     relative = wxT("T");
   } else {
     if (angle > 180.0) {
@@ -1274,7 +1276,12 @@ wxString RadarInfo::GetCanvasTextBottomLeft() {
         if (orientation == ORIENTATION_STABILIZED_UP) {
           bearing += m_course;
           bearing = MOD_DEGREES_FLOAT(bearing);
+        } else if (orientation == ORIENTATION_COG_UP) {
+          bearing += m_pi->GetCOG();
+          bearing = MOD_DEGREES_FLOAT(bearing);
         }
+
+        if (orientation != ORIENTATION_HEAD_UP && m_bearing_relative.GetValue()) bearing -= m_pi->GetHeadingTrue();
 
         if (s.length()) {
           s << wxT("\n");
@@ -1299,10 +1306,12 @@ wxString RadarInfo::GetCanvasTextBottomLeft() {
       // Can't compute this upfront, ownship may move...
       distance = local_distance(radar_pos, m_mouse_pos);
       bearing = local_bearing(radar_pos, m_mouse_pos);
-      if (GetOrientation() != ORIENTATION_NORTH_UP) {
+      if (GetOrientation() == ORIENTATION_HEAD_UP) {
         bearing -= m_pi->GetHeadingTrue();
       }
     }
+
+    if (orientation != ORIENTATION_HEAD_UP && m_bearing_relative.GetValue()) bearing -= m_pi->GetHeadingTrue();
 
     if (distance != 0.0) {
       if (s.length()) {
@@ -1794,3 +1803,4 @@ NetworkAddress RadarInfo::GetRadarInterfaceAddress() {
 }
 
 PLUGIN_END_NAMESPACE
+

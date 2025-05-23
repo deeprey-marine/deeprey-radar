@@ -1597,7 +1597,7 @@ bool radar_pi::LoadConfig(void) {
         continue;  // This happens if someone changed the name in the config file or
                    // we drop support for a type or rename it.
       }
-
+      
       pConf->Read(wxString::Format(wxT("Radar%dInterface"), r), &s, "0.0.0.0");
       radar_inet_aton(s.c_str(), &ri->m_radar_interface_address.addr);
       ri->m_radar_interface_address.port = 0;
@@ -1614,6 +1614,8 @@ bool radar_pi::LoadConfig(void) {
         v = ORIENTATION_STABILIZED_UP;
       }
       ri->m_orientation.Update(v);
+      pConf->Read(wxString::Format(wxT("Radar%dBearingRelative"), r), &v, 0);
+      ri->m_bearing_relative.Update(v);
 
       pConf->Read(wxString::Format(wxT("Radar%dTransmit"), r), &v, 0);
       ri->m_boot_state.Update(v);
@@ -1624,9 +1626,11 @@ bool radar_pi::LoadConfig(void) {
       pConf->Read(wxString::Format(wxT("Radar%dThreshold"), r), &v, 0);
       ri->m_threshold.Update(v);
 
-      pConf->Read(wxString::Format(wxT("Radar%dTrailsState"), r), &state, RCS_OFF);
-      pConf->Read(wxString::Format(wxT("Radar%dTrails"), r), &v, 0);
-      ri->m_target_trails.Update(v, (RadarControlState)state);
+      //pConf->Read(wxString::Format(wxT("Radar%dTrailsState"), r), &state, RCS_OFF);
+      //pConf->Read(wxString::Format(wxT("Radar%dTrails"), r), &v, 0);
+      //ri->m_target_trails.Update(v, (RadarControlState)state);
+      ri->m_target_trails.Update(0);
+
       LOG_VERBOSE(wxT("Radar %d Target trails value %d state %d read from ini file"), r, v, state);
       pConf->Read(wxString::Format(wxT("Radar%dTrueTrailsMotion"), r), &v, 1);
       ri->m_trails_motion.Update(v);
@@ -1798,6 +1802,7 @@ bool radar_pi::SaveConfig(void) {
       pConf->Write(wxString::Format(wxT("Radar%dInterface"), r), m_radar[r]->GetRadarInterfaceAddress().FormatNetworkAddress());
       pConf->Write(wxString::Format(wxT("Radar%dRange"), r), m_radar[r]->m_range.GetValue());
       pConf->Write(wxString::Format(wxT("Radar%dRotation"), r), m_radar[r]->m_orientation.GetValue());
+      pConf->Write(wxString::Format(wxT("Radar%dBearingRelative"), r), m_radar[r]->m_bearing_relative.GetValue());
       pConf->Write(wxString::Format(wxT("Radar%dTransmit"), r), m_radar[r]->m_state.GetValue());
       pConf->Write(wxString::Format(wxT("Radar%dWindowShow"), r), m_settings.show_radar[r]);
       pConf->Write(wxString::Format(wxT("Radar%dWindowDock"), r), m_settings.dock_radar[r]);
@@ -2273,7 +2278,7 @@ bool radar_pi::SelectRadarType(int type, bool reLoad) {
       radarType = static_cast<RadarType>(type);
   }
 
-
+  SaveConfig();
   if (m_radar[0]) {
       m_radar[0]->RequestRadarState(RADAR_STANDBY);
       // ou m_radar[r]->RequestRadarState(RADAR_OFF);
@@ -2285,7 +2290,7 @@ bool radar_pi::SelectRadarType(int type, bool reLoad) {
       m_radar[0]->Shutdown();
       RemoveCanvasContextMenuItem(m_context_menu_control_id[0]);
 
-      StopRadarLocators();
+      StopRadarLocators();      
       delete m_radar[0];
       m_radar[0] = 0;
   }
@@ -2293,10 +2298,11 @@ bool radar_pi::SelectRadarType(int type, bool reLoad) {
   m_settings.window_pos[0] = wxPoint(100, 100);
   m_settings.control_pos[0] = wxDefaultPosition;
   m_radar[0] = new RadarInfo(this, 0);
+  LoadConfig();
   m_radar[0]->m_radar_type = radarType;  // modify type of existing radar ?
   m_settings.radar_count = 1;
 
-  m_radar[0]->Init();
+  m_radar[0]->Init();  
 
   StartRadarLocators(0);
 

@@ -19,43 +19,9 @@ RadarAPI::~RadarAPI() {
 
 bool RadarAPI::SetControl(ControlType controlType, int value, int controlIndex) {
 
-  switch (controlType) {
-
-    case CT_RANGE: {
-      int rangeMeters = value;
-      if (rangeMeters < m_pi->m_radar[0]->m_range.GetMin())
-        rangeMeters = m_pi->m_radar[0]->m_range.GetMin();
-      if (rangeMeters > m_pi->m_radar[0]->m_range.GetMax())
-        rangeMeters = m_pi->m_radar[0]->m_range.GetMax();
-      // Apply
-      if (m_pi->m_radar[0]->m_control) {
-        m_pi->m_radar[0]->m_control->SetRange(rangeMeters);
-        // Update locally
-        m_pi->m_radar[0]->m_range.Update(rangeMeters);
-      }
-      break;
-    }
-
-    case CT_OVERLAY_CANVAS: {
-      m_pi->m_radar[0]->m_overlay_canvas[controlIndex].Update(value);    
-      break;
-    }
-
-    case CT_GAIN: {
-      SetControl(controlType, value, m_pi->m_radar[0]->m_gain);
-      break;
-    }
-    case CT_SEA:
-    {
-      SetControl(controlType, value, m_pi->m_radar[0]->m_sea);
-      break;
-    }
-    case CT_RAIN: {
-      SetControl(controlType, value, m_pi->m_radar[0]->m_rain);
-      break;
-    }
-  }
-
+  RadarControlItem* controlItem = GetControlItem(controlType, controlIndex);
+  if (controlItem)
+    SetControl(controlType, value, *controlItem);  
 
   return true;
 }
@@ -64,6 +30,10 @@ RadarControlItem* RadarAPI::GetControlItem(ControlType controlType, int controlI
 {
   RadarControlItem* result = nullptr;
   switch (controlType) {
+    case CT_OVERLAY_CANVAS: {
+      result = &m_pi->m_radar[0]->m_overlay_canvas[controlIndex];
+      break;
+    }
     case CT_GAIN: {
       result = &m_pi->m_radar[0]->m_gain;
       break;
@@ -78,6 +48,18 @@ RadarControlItem* RadarAPI::GetControlItem(ControlType controlType, int controlI
     }
     case CT_RANGE: {
       result = &m_pi->m_radar[0]->m_range;
+      break;
+    }
+    case CT_ORIENTATION: {
+      result = &m_pi->m_radar[0]->m_orientation;
+      break;
+    }
+    case CT_BEARING_RELATIVE: {
+      result = &m_pi->m_radar[0]->m_bearing_relative;
+      break;
+    }
+    case CT_TRAILS_MOTION: {
+      result = &m_pi->m_radar[0]->m_trails_motion;
       break;
     }
   }
@@ -113,30 +95,8 @@ void RadarAPI::SetControl(ControlType controlType, int value, RadarControlItem& 
 
 bool RadarAPI::GetControl(ControlType controlType, int* value, RadarControlState* state, int controlIndex) {
 
-    RadarControlItem* item = nullptr;
-    switch (controlType) {
-
-      case CT_RANGE: {
-        item = &m_pi->m_radar[0]->m_range;
-      } break;
-
-      case CT_OVERLAY_CANVAS: {
-        item = &m_pi->m_radar[0]->m_overlay_canvas[controlIndex];        
-      } break;
-
-      case CT_GAIN: {
-        item = &m_pi->m_radar[0]->m_gain;
-      } break;
-
-      case CT_SEA: {
-        item = &m_pi->m_radar[0]->m_sea;
-      } break;
-      case CT_RAIN: {
-        item = &m_pi->m_radar[0]->m_rain;
-      } break;
-    }
-
-    return item ? item->GetButton(value, state) : false;
+    RadarControlItem* controlItem = GetControlItem(controlType, controlIndex); 
+    return controlItem ? controlItem->GetButton(value, state) : false;
 }
 
 int RadarAPI::GetControl(ControlType controlType, int controlIndex)
@@ -247,5 +207,7 @@ void RadarAPI::SendPongMessage() {
 RadarState RadarAPI::GetRadarState() { return (RadarState)m_pi->m_radar[0]->m_state.GetButton(); }
 
 void RadarAPI::AdjustRange(int adjustment) {  m_pi->m_radar[0]->AdjustRange(adjustment); }
+
+bool RadarAPI::HasHeadingSource() { return m_pi->GetHeadingSource() != HEADING_NONE; }
 
 PLUGIN_END_NAMESPACE
