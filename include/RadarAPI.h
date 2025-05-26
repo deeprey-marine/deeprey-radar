@@ -65,6 +65,8 @@ public:
     /************************************************/
 
     virtual bool SelectRadarType(int type);
+    virtual int GetRadarType();
+    virtual void SetRadarTypeChangeCallback(std::function<void()> callback);
 
     virtual ControlInfo* GetRadarControls();
 
@@ -83,6 +85,7 @@ private:
     radar_pi* m_pi;
 
     IRadarOverlay* m_overlay; // single overlay pointer
+    std::function<void()> m_radarTypeChangeCallback;
 };
 
 }

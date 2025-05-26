@@ -191,8 +191,14 @@ void RadarAPI::SendMessageToDp(std::initializer_list<std::pair<const wxString, w
 
 bool RadarAPI::SelectRadarType(int type) {
   // Select radar type
-  return m_pi->SelectRadarType(type);
+  bool result = m_pi->SelectRadarType(type);
+  if (m_radarTypeChangeCallback) m_radarTypeChangeCallback();
+  return result;
 }
+
+int RadarAPI::GetRadarType() { return m_pi->m_radar[0]->m_radar_type; }
+
+void RadarAPI::SetRadarTypeChangeCallback(std::function<void()> callback) { m_radarTypeChangeCallback = callback; }
 
 ControlInfo* RadarAPI::GetRadarControls() { return m_pi->m_radar[0]->m_ctrl; }
 
