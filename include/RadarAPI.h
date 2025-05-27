@@ -67,6 +67,8 @@ public:
     virtual bool SelectRadarType(int type);
     virtual int GetRadarType();
     virtual void SetRadarTypeChangeCallback(std::function<void()> callback);
+    virtual uint64_t AddCanvasOverlayEnabledChangeCallback(std::function<void(int)> callback);
+    virtual void RemoveCanvasOverlayEnabledChangeCallback(uint64_t callbackID);
 
     virtual ControlInfo* GetRadarControls();
 
@@ -86,6 +88,8 @@ private:
 
     IRadarOverlay* m_overlay; // single overlay pointer
     std::function<void()> m_radarTypeChangeCallback;
+    std::unordered_map<uint64_t, std::function<void(int)>> m_canvasOverlayEnabledChangeCallbacks;
+    uint64_t m_nextCallbackID;
 };
 
 }

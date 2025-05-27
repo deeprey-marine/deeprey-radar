@@ -8,7 +8,7 @@
 
 PLUGIN_BEGIN_NAMESPACE
 RadarAPI::RadarAPI(radar_pi* radarPlugin)
-  : m_pi(radarPlugin), m_overlay(nullptr) {
+  : m_pi(radarPlugin), m_overlay(nullptr), m_nextCallbackID(1) {
   // constructor
 }
 
@@ -20,9 +20,15 @@ RadarAPI::~RadarAPI() {
 bool RadarAPI::SetControl(ControlType controlType, int value, int controlIndex) {
 
   RadarControlItem* controlItem = GetControlItem(controlType, controlIndex);
-  if (controlItem)
-    SetControl(controlType, value, *controlItem);  
+  if (controlItem) {
+    SetControl(controlType, value, *controlItem);
 
+    if (controlType == CT_OVERLAY_CANVAS) {
+      for (auto callback : m_canvasOverlayEnabledChangeCallbacks) {
+        callback.second(controlIndex);
+      }
+    }
+  }
   return true;
 }
 
@@ -199,6 +205,17 @@ bool RadarAPI::SelectRadarType(int type) {
 int RadarAPI::GetRadarType() { return m_pi->m_radar[0]->m_radar_type; }
 
 void RadarAPI::SetRadarTypeChangeCallback(std::function<void()> callback) { m_radarTypeChangeCallback = callback; }
+
+uint64_t RadarAPI::AddCanvasOverlayEnabledChangeCallback(std::function<void(int)> callback) {
+  uint64_t id = m_nextCallbackID++;
+  m_canvasOverlayEnabledChangeCallbacks[id] = callback;
+  return id;
+}
+
+void RadarAPI::RemoveCanvasOverlayEnabledChangeCallback(uint64_t callbackID)
+{
+  m_canvasOverlayEnabledChangeCallbacks.erase(callbackID);
+}
 
 ControlInfo* RadarAPI::GetRadarControls() { return m_pi->m_radar[0]->m_ctrl; }
 
