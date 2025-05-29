@@ -1431,13 +1431,19 @@ bool radar_pi::RenderGLOverlayMultiCanvas(wxGLContext *pcontext, PlugIn_ViewPort
   }
 
   wxLongLong now = wxGetUTCTimeMillis();
-  // Update m_overlay[canvasIndex] by checking all radars, value may be modified by the buttons
-  m_chart_overlay[canvasIndex] = -1;
-  for (size_t r = 0; r < M_SETTINGS.radar_count; r++) {
-    if (m_radar[r]->m_overlay_canvas[canvasIndex].GetValue() != 0) {
-      m_chart_overlay[canvasIndex] = r;
-    }
+  // Update m_chart_overlay by checking all radars, value may be modified by the buttons
+  { 
+    static int prevCanvasIndex = 1;
+    if (prevCanvasIndex == 0 && canvasIndex == 0) m_chart_overlay[1] = -1;
+    prevCanvasIndex = canvasIndex;
   }
+  
+  m_chart_overlay[canvasIndex] = -1;
+    for (size_t r = 0; r < M_SETTINGS.radar_count; r++) {
+    if (m_radar[r]->m_overlay_canvas[canvasIndex].GetValue() != 0) {
+        m_chart_overlay[canvasIndex] = r;
+        }
+    }
   m_current_canvas_index = canvasIndex;
   int current_overlay_radar = m_chart_overlay[canvasIndex];
   m_max_canvas = GetCanvasCount();
@@ -1501,7 +1507,7 @@ bool radar_pi::RenderGLOverlayMultiCanvas(wxGLContext *pcontext, PlugIn_ViewPort
     if (canvasIndex == highest) {
       m_radar[current_overlay_radar]->SetAutoRangeMeters(auto_range_meters);
     }
-
+    
     //    Calculate image scale factor
     double dist_y, v_scale_ppm;
     GetCanvasLLPix(vp, wxPoint(0, vp->pix_height - 1), &pos_max.lat, &pos_max.lon);  // is pix_height a mapable coordinate?
@@ -2382,7 +2388,7 @@ void radar_pi::EnablePPIRender() {
       chartCanvasWindow->Hide();
   }
 
-} 
+}
 
 
 }  // namespace RadarPlugin
