@@ -219,6 +219,10 @@ void RadarAPI::RemoveCanvasOverlayEnabledChangeCallback(uint64_t callbackID)
 
 ControlInfo* RadarAPI::GetRadarControls() { return m_pi->m_radar[0]->m_ctrl; }
 
+GuardZone** RadarAPI::GetGuardZones() { return m_pi->m_radar[0]->m_guard_zone; }
+
+double RadarAPI::GetRangeUnitsToMeters() { return RangeUnitsToMeters[m_pi->m_settings.range_units]; }
+
 void RadarAPI::SendPongMessage() {
   SendMessageToDp({{"type", "pong"}, {"api", wxULongLong((wxULongLong_t)this)}});
 }

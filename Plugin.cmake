@@ -89,6 +89,7 @@ set(GENERAL_HEADERS
     include/icons.h
     include/pi_common.h
 #    include/radar_pi.h
+    include/radar_pi_api.h
     include/shaderutil.h
     include/socketutil.h
 #    include/RadarAPI.h

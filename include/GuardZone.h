@@ -32,9 +32,13 @@
 #ifndef _GUARDZONE_H_
 #define _GUARDZONE_H_
 
-#include "radar_pi.h"
+#include "radar_pi_api.h"
+#include <cstdint>
 
 namespace RadarPlugin {
+
+class radar_pi;
+class RadarInfo;
 
 class GuardZone {
 public:
@@ -48,51 +52,15 @@ public:
     time_t m_show_time;
     wxLongLong m_arpa_update_time[SPOKES_MAX];
 
-    void ResetBogeys()
-    {
-        m_bogey_count = -1;
-        m_running_count = 0;
-        m_last_in_guard_zone = false;
-        m_last_angle = 0;
-    };
+    void ResetBogeys();
 
-    void SetType(GuardZoneType type)
-    {
-        m_type = type;
-        if (m_type > (GuardZoneType)1)
-            m_type = (GuardZoneType)0;
-        ResetBogeys();
-    };
-    void SetStartBearing(SpokeBearing start_bearing)
-    {
-        m_start_bearing = start_bearing;
-        ResetBogeys();
-    };
-    void SetEndBearing(SpokeBearing end_bearing)
-    {
-        m_end_bearing = end_bearing;
-        ResetBogeys();
-    };
-    void SetInnerRange(int inner_range)
-    {
-        m_inner_range = inner_range;
-        ResetBogeys();
-    };
-    void SetOuterRange(int outer_range)
-    {
-        m_outer_range = outer_range;
-        ResetBogeys();
-    };
-    void SetArpaOn(int arpa) { m_arpa_on = arpa; };
-    void SetAlarmOn(int alarm)
-    {
-        m_alarm_on = alarm;
-        if (m_alarm_on) {
-            m_pi->m_guard_bogey_confirmed = false;
-        } else {
-            ResetBogeys();
-        }
-    };
+    virtual void SetType(GuardZoneType type);
+    virtual void SetStartBearing(SpokeBearing start_bearing);
+    virtual void SetEndBearing(SpokeBearing end_bearing);
+    virtual void SetInnerRange(int inner_range);
+    virtual void SetOuterRange(int outer_range);
+    virtual void SetArpaOn(int arpa);
+    virtual void SetAlarmOn(int alarm);
 
     /*
      * Check if data is in this GuardZone, if so update bogeyCount
@@ -103,18 +71,11 @@ public:
     // Find targets inside the zone
     void SearchTargets();
 
-    int GetBogeyCount()
-    {
-        if (m_bogey_count > -1) {
-            LOG_GUARD(wxT("%s reporting bogey_count=%d"), m_log_name.c_str(),
-                m_bogey_count);
-        }
-        return m_bogey_count;
-    };
+    int GetBogeyCount();
 
     GuardZone(radar_pi* pi, RadarInfo* ri, int zone);
 
-    ~GuardZone() { LOG_VERBOSE(wxT("%s destroyed"), m_log_name.c_str()); }
+    ~GuardZone();
 
 private:
     radar_pi* m_pi;

@@ -104,11 +104,8 @@ static const int SECONDS_PER_TIMED_RUN_SETTING = 60;
 
 #define OPENGL_ROTATION (-90.0) // Difference between 'up' and OpenGL 'up'...
 
-typedef int SpokeBearing; // A value from 0 -- LINES_PER_ROTATION indicating a
-                          // bearing (? = North, +ve = clockwise)
+#include "radar_pi_api.h"
 
-typedef int AngleDegrees; // An angle relative to North or HeadUp. Generally
-                          // [0..359> or [-180,180]
 
 // Use the above to convert from 'raw' headings sent by the radar (0..4095) into
 // classical degrees (0..359) and back
@@ -264,8 +261,6 @@ struct receive_statistics {
     int broken_spokes;
     int missing_spokes;
 };
-
-typedef enum GuardZoneType { GZ_ARC, GZ_CIRCLE } GuardZoneType;
 
 typedef enum RadarType {
 #define DEFINE_RADAR(t, n, s, l, a, b, c, d) t,

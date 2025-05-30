@@ -8,6 +8,7 @@
 #include "ControlType.h"
 #include "RadarState.h"
 #include "RadarControlState.h"
+#include <cstdint>
 
 class ControlInfo;
 class RadarControlItem;
@@ -21,6 +22,7 @@ class wxVariant;
 class wxMouseEvent;
 
 namespace RadarPlugin {
+class GuardZone;
 
 /**
  * Interface for a plugin wanting to draw on the radar's OpenGL canvas.
@@ -71,6 +73,8 @@ public:
     virtual void RemoveCanvasOverlayEnabledChangeCallback(uint64_t callbackID);
 
     virtual ControlInfo* GetRadarControls();
+    virtual GuardZone** GetGuardZones();
+    virtual double GetRangeUnitsToMeters();
 
     IRadarOverlay* GetOverlay() const { return m_overlay; }
 

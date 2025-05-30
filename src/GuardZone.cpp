@@ -217,4 +217,51 @@ void GuardZone::SearchTargets() {
   return;
 }
 
+void GuardZone::ResetBogeys() {
+  m_bogey_count = -1;
+  m_running_count = 0;
+  m_last_in_guard_zone = false;
+  m_last_angle = 0;
+};
+
+void GuardZone::SetType(GuardZoneType type) {
+  m_type = type;
+  if (m_type > (GuardZoneType)1) m_type = (GuardZoneType)0;
+  ResetBogeys();
+};
+void GuardZone::SetStartBearing(SpokeBearing start_bearing) {
+  m_start_bearing = start_bearing;
+  ResetBogeys();
+};
+void GuardZone::SetEndBearing(SpokeBearing end_bearing) {
+  m_end_bearing = end_bearing;
+  ResetBogeys();
+};
+void GuardZone::SetInnerRange(int inner_range) {
+  m_inner_range = inner_range;
+  ResetBogeys();
+};
+void GuardZone::SetOuterRange(int outer_range) {
+  m_outer_range = outer_range;
+  ResetBogeys();
+};
+void GuardZone::SetArpaOn(int arpa) { m_arpa_on = arpa; };
+void GuardZone::SetAlarmOn(int alarm) {
+  m_alarm_on = alarm;
+  if (m_alarm_on) {
+    m_pi->m_guard_bogey_confirmed = false;
+  } else {
+    ResetBogeys();
+  }
+};
+
+int GuardZone::GetBogeyCount() {
+  if (m_bogey_count > -1) {
+    LOG_GUARD(wxT("%s reporting bogey_count=%d"), m_log_name.c_str(), m_bogey_count);
+  }
+  return m_bogey_count;
+};
+
+GuardZone::~GuardZone() { LOG_VERBOSE(wxT("%s destroyed"), m_log_name.c_str()); }
+
 PLUGIN_END_NAMESPACE
