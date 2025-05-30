@@ -68,6 +68,34 @@ RadarControlItem* RadarAPI::GetControlItem(ControlType controlType, int controlI
       result = &m_pi->m_radar[0]->m_trails_motion;
       break;
     }
+    case CT_NOISE_REJECTION: {
+      result = &m_pi->m_radar[0]->m_noise_rejection;
+      break;
+    }
+    case CT_THRESHOLD: {
+      result = &m_pi->m_radar[0]->m_threshold;
+      break;
+    }
+    case CT_TARGET_EXPANSION: {
+      result = &m_pi->m_radar[0]->m_target_expansion;
+      break;
+    }
+    case CT_INTERFERENCE_REJECTION: {
+      result = &m_pi->m_radar[0]->m_interference_rejection;
+      break;
+    }
+    case CT_TARGET_SEPARATION: {
+      result = &m_pi->m_radar[0]->m_target_separation;
+      break;
+    }
+    case CT_SCAN_SPEED: {
+      result = &m_pi->m_radar[0]->m_scan_speed;
+      break;
+    }
+    case CT_TARGET_BOOST: {
+      result = &m_pi->m_radar[0]->m_target_boost;
+      break;
+    }
   }
 
   return result;
