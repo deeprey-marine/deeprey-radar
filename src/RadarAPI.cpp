@@ -4,6 +4,7 @@
 #include "RadarAPI.h"
 
 #include "RadarInfo.h"
+#include "MessageBox.h"
 
 
 PLUGIN_BEGIN_NAMESPACE
@@ -260,5 +261,11 @@ RadarState RadarAPI::GetRadarState() { return (RadarState)m_pi->m_radar[0]->m_st
 void RadarAPI::AdjustRange(int adjustment) {  m_pi->m_radar[0]->AdjustRange(adjustment); }
 
 bool RadarAPI::HasHeadingSource() { return m_pi->GetHeadingSource() != HEADING_NONE; }
+
+void RadarAPI::ShowInfoDialog() {
+  if (m_pi->m_pMessageBox) {
+    m_pi->m_pMessageBox->UpdateMessage(true);
+  }
+}
 
 PLUGIN_END_NAMESPACE

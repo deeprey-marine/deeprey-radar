@@ -700,7 +700,7 @@ private:
     void SetRadarWindowViz(bool reparent = false);
     void UpdateCOGAvg(double cog);
     void OnTimerNotify(wxTimerEvent& event);
-    void TimedControlUpdate();
+        
     void TimedUpdate(wxTimerEvent& event);
     void ScheduleWindowRefresh();
     void SetOpenGLMode(OpenGLMode mode);
@@ -824,6 +824,7 @@ private:
 
 public:
     bool SelectRadarType(int type, bool reLoad = false);
+    void TimedControlUpdate();
 
     DECLARE_EVENT_TABLE()
 };

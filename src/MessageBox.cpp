@@ -43,6 +43,7 @@ enum {  // process ID's
   ID_RADAR,
   ID_DATA,
   ID_HEADING,
+  ID_UPDATE_TIMER
 };
 
 //---------------------------------------------------------------------------------------
@@ -59,10 +60,11 @@ EVT_BUTTON(ID_MSG_HIDE, MessageBox::OnMessageHideRadarClick)
 
 EVT_MOVE(MessageBox::OnMove)
 EVT_SIZE(MessageBox::OnSize)
+EVT_TIMER(ID_UPDATE_TIMER, MessageBox::OnUpdateControlsTimer)
 
 END_EVENT_TABLE()
 
-MessageBox::MessageBox() { Init(); }
+MessageBox::MessageBox() : m_updateControlsTimer(this, ID_UPDATE_TIMER) { Init(); }
 
 MessageBox::~MessageBox() {}
 
@@ -75,6 +77,7 @@ void MessageBox::Init() {
   m_message_sizer = 0;
   CLEAR_STRUCT(m_radar_box);
   CLEAR_STRUCT(m_radar_text);
+  m_updateControlsTimer.Start(UPDATE_CONTROLS_TIMER_PERIOD_MS);
 }
 
 bool MessageBox::Create(wxWindow *parent, radar_pi *pi) {
@@ -143,17 +146,17 @@ void MessageBox::CreateControls() {
     m_radar_text[i]->Hide();
   }
 
-  wxStaticBox *optionsBox = new wxStaticBox(this, wxID_ANY, _("Required OpenCPN option"));
-  optionsBox->SetFont(m_pi->m_font);
-  wxStaticBoxSizer *optionsSizer = new wxStaticBoxSizer(optionsBox, wxVERTICAL);
-  m_message_sizer->Add(optionsSizer, 0, wxEXPAND | wxALL, BORDER * 2);
+  //wxStaticBox *optionsBox = new wxStaticBox(this, wxID_ANY, _("Required OpenCPN option"));
+  //optionsBox->SetFont(m_pi->m_font);
+  //wxStaticBoxSizer *optionsSizer = new wxStaticBoxSizer(optionsBox, wxVERTICAL);
+  //m_message_sizer->Add(optionsSizer, 0, wxEXPAND | wxALL, BORDER * 2);
 
-  // Use the same string as OpenCPN so it gets translated by the Core translation files
-  m_have_open_gl = new wxCheckBox(this, ID_BPOS, _("Use Accelerated Graphics (OpenGL)"), wxDefaultPosition, wxDefaultSize,
-                                  wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
-  optionsSizer->Add(m_have_open_gl, 0, wxALL, BORDER);
-  m_have_open_gl->SetFont(m_pi->m_font);
-  m_have_open_gl->Disable();
+  //// Use the same string as OpenCPN so it gets translated by the Core translation files
+  //m_have_open_gl = new wxCheckBox(this, ID_BPOS, _("Use Accelerated Graphics (OpenGL)"), wxDefaultPosition, wxDefaultSize,
+  //                                wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+  //optionsSizer->Add(m_have_open_gl, 0, wxALL, BORDER);
+  //m_have_open_gl->SetFont(m_pi->m_font);
+  //m_have_open_gl->Disable();
 
   wxStaticBox *nmeaBox = new wxStaticBox(this, wxID_ANY, _("For radar overlay also required"));
   nmeaBox->SetFont(m_pi->m_font);
@@ -205,9 +208,9 @@ void MessageBox::CreateControls() {
   m_info_sizer->Add(m_statistics, 0, wxALIGN_CENTER_HORIZONTAL | wxST_NO_AUTORESIZE, BORDER);
 
   // The <Choose Radar> button
-  m_choose_button = new wxButton(this, ID_MSG_CHOOSE, _("Select radar types"), wxDefaultPosition, wxDefaultSize, 0);
-  m_choose_button->SetFont(m_pi->m_font);
-  m_message_sizer->Add(m_choose_button, 0, wxALL, BORDER);
+  //m_choose_button = new wxButton(this, ID_MSG_CHOOSE, _("Select radar types"), wxDefaultPosition, wxDefaultSize, 0);
+  //m_choose_button->SetFont(m_pi->m_font);
+  //m_message_sizer->Add(m_choose_button, 0, wxALL, BORDER);
 
   // The <Hide Radar> button
   m_hide_radar = new wxButton(this, ID_MSG_HIDE, _("&Hide Radar"), wxDefaultPosition, wxDefaultSize, 0);
@@ -251,7 +254,7 @@ bool MessageBox::IsModalDialogShown() {
 
 bool MessageBox::Show(bool show) {
   LOG_DIALOG(wxT("message box show = %d"), (int)show);
-  show = false;
+
   if (show) {
     CenterOnParent();
   }
@@ -296,36 +299,37 @@ bool MessageBox::UpdateMessage(bool force) {
   if (!m_allow_auto_hide) {
     LOG_DIALOG(wxT("messagebox explicit wanted: SHOW_CLOSE"));
     new_message_state = SHOW_CLOSE;
-  } else if (IsModalDialogShown()) {
-    LOG_DIALOG(wxT("messagebox modal dialog shown: HIDE"));
-    new_message_state = HIDE;
-  } else if (!showRadar) {
-    LOG_DIALOG(wxT("messagebox no radar wanted: HIDE"));
-    new_message_state = HIDE;
-  } else if (!haveOpenGL) {
-    LOG_DIALOG(wxT("messagebox no OpenGL: SHOW"));
-    new_message_state = SHOW;
-    ret = true;
-  } else if (no_overlay) {
-    if (radarOn) {
-      LOG_DIALOG(wxT("messagebox radar window needs met: HIDE"));
-      new_message_state = HIDE;
-    } else {
-      LOG_DIALOG(wxT("messagebox radar window needs not met: SHOW_NO_NMEA"));
-      new_message_state = SHOW_NO_NMEA;
-    }
-  } else {  // overlay
-    if (navOn && radarOn) {
-      LOG_DIALOG(wxT("messagebox overlay needs met: HIDE"));
-      new_message_state = HIDE;
-    } else {
-      LOG_DIALOG(wxT("messagebox overlay needs not met: SHOW"));
-      new_message_state = SHOW;
-      ret = true;
-    }
   }
+  //else if (IsModalDialogShown()) {
+  //  LOG_DIALOG(wxT("messagebox modal dialog shown: HIDE"));
+  //  new_message_state = HIDE;
+  //} else if (!showRadar) {
+  //  LOG_DIALOG(wxT("messagebox no radar wanted: HIDE"));
+  //  new_message_state = HIDE;
+  //} else if (!haveOpenGL) {
+  //  LOG_DIALOG(wxT("messagebox no OpenGL: SHOW"));
+  //  new_message_state = SHOW;
+  //  ret = true;
+  //} else if (no_overlay) {
+  //  if (radarOn) {
+  //    LOG_DIALOG(wxT("messagebox radar window needs met: HIDE"));
+  //    new_message_state = HIDE;
+  //  } else {
+  //    LOG_DIALOG(wxT("messagebox radar window needs not met: SHOW_NO_NMEA"));
+  //    new_message_state = SHOW_NO_NMEA;
+  //  }
+  //} else {  // overlay
+  //  if (navOn && radarOn) {
+  //    LOG_DIALOG(wxT("messagebox overlay needs met: HIDE"));
+  //    new_message_state = HIDE;
+  //  } else {
+  //    LOG_DIALOG(wxT("messagebox overlay needs not met: SHOW"));
+  //    new_message_state = SHOW;
+  //    ret = true;
+  //  }
+  //}
 
-  m_have_open_gl->SetValue(haveOpenGL);
+  //m_have_open_gl->SetValue(haveOpenGL);
   m_have_boat_pos->SetValue(haveGPS);
   m_have_true_heading->SetValue(haveTrueHeading);
   m_have_mag_heading->SetValue(haveMagHeading);
@@ -448,5 +452,7 @@ void MessageBox::SetVariationInfo(wxString &msg) {
 }
 
 void MessageBox::SetStatisticsInfo(wxString &msg) { m_statistics_info.Update(msg); }
+
+void MessageBox::OnUpdateControlsTimer(wxTimerEvent &event) { m_pi->TimedControlUpdate(); }
 
 PLUGIN_END_NAMESPACE

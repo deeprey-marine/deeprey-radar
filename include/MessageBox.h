@@ -98,6 +98,7 @@ public:
     void OnClose(wxCloseEvent& event);
 
 private:
+    static const int UPDATE_CONTROLS_TIMER_PERIOD_MS = 100;
     void OnIdOKClick(wxCommandEvent& event);
     void OnMove(wxMoveEvent& event);
     void OnSize(wxSizeEvent& event);
@@ -105,12 +106,14 @@ private:
     void OnMessageCloseButtonClick(wxCommandEvent& event);
     void OnMessageHideRadarClick(wxCommandEvent& event);
     void OnMessageChooseRadarClick(wxCommandEvent& event);
+    void OnUpdateControlsTimer(wxTimerEvent& event);
 
     bool IsModalDialogShown();
 
     wxWindow* m_parent;
     radar_pi* m_pi;
 
+    wxTimer m_updateControlsTimer;
     radar_info_item m_true_heading_info;
     radar_info_item m_mag_heading_info;
     radar_info_item m_variation_info;
@@ -131,10 +134,10 @@ private:
     wxStaticText* m_radar_text[4];
 
     // MessageBox
-    wxButton* m_choose_button;
+    //wxButton* m_choose_button;
     wxButton* m_hide_radar;
     wxButton* m_close_button;
-    wxCheckBox* m_have_open_gl;
+    //wxCheckBox* m_have_open_gl;
     wxCheckBox* m_have_boat_pos;
     wxCheckBox* m_have_true_heading;
     wxCheckBox* m_have_mag_heading;

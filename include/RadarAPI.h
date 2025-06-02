@@ -75,6 +75,7 @@ public:
     virtual ControlInfo* GetRadarControls();
     virtual GuardZone** GetGuardZones();
     virtual double GetRangeUnitsToMeters();
+    virtual void ShowInfoDialog();
 
     IRadarOverlay* GetOverlay() const { return m_overlay; }
 

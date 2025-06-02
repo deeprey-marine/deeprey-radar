@@ -1529,7 +1529,7 @@ bool radar_pi::RenderGLOverlayMultiCanvas(wxGLContext *pcontext, PlugIn_ViewPort
   if (canvasIndex == 0) {
     ScheduleWindowRefresh();
   }
-  TimedControlUpdate();
+  
   m_render_busy = false;
   return true;
 }
