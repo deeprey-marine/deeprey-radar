@@ -279,4 +279,6 @@ void RadarAPI::ShowInfoDialog() {
 
 void RadarAPI::ClearTrails() { m_pi->m_radar[0]->m_trails->ClearTrails(); }
 
+PersistentSettings* RadarAPI::GetSettings() { return &m_pi->m_settings; }
+
 PLUGIN_END_NAMESPACE

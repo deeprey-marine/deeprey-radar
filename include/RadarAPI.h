@@ -23,6 +23,7 @@ class wxMouseEvent;
 
 namespace RadarPlugin {
 class GuardZone;
+struct PersistentSettings;
 
 /**
  * Interface for a plugin wanting to draw on the radar's OpenGL canvas.
@@ -77,6 +78,7 @@ public:
     virtual double GetRangeUnitsToMeters();
     virtual void ShowInfoDialog();
     virtual void ClearTrails();
+    virtual PersistentSettings* GetSettings();
 
     IRadarOverlay* GetOverlay() const { return m_overlay; }
 

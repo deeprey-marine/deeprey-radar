@@ -346,4 +346,104 @@ void freeifaddrs(struct ifaddrs *ifa) { free(ifa); }
 
 #endif
 
+
+NetworkAddress::NetworkAddress() {
+  addr.s_addr = 0;
+  port = 0;
+}
+
+NetworkAddress::NetworkAddress(PackedAddress packed) {
+  addr.s_addr = packed.addr.s_addr;
+  port = packed.port;
+}
+
+NetworkAddress::NetworkAddress(uint8_t a, uint8_t b, uint8_t c, uint8_t d, uint16_t p) {
+  uint8_t *paddr = (uint8_t *)&addr;
+
+  paddr[0] = a;
+  paddr[1] = b;
+  paddr[2] = c;
+  paddr[3] = d;
+
+  port = htons(p);
+}
+
+NetworkAddress::NetworkAddress(const wxString str) {
+  uint8_t *paddr = (uint8_t *)&addr;
+  wxStringTokenizer tokenizer(str, wxT(".:"));
+
+  addr.s_addr = 0;
+  port = 0;
+
+  if (tokenizer.HasMoreTokens()) {
+    paddr[0] = wxAtoi(tokenizer.GetNextToken());
+  }
+  if (tokenizer.HasMoreTokens()) {
+    paddr[1] = wxAtoi(tokenizer.GetNextToken());
+  }
+  if (tokenizer.HasMoreTokens()) {
+    paddr[2] = wxAtoi(tokenizer.GetNextToken());
+  }
+  if (tokenizer.HasMoreTokens()) {
+    paddr[3] = wxAtoi(tokenizer.GetNextToken());
+  }
+  if (tokenizer.HasMoreTokens()) {
+    port = htons(wxAtoi(tokenizer.GetNextToken()));
+  }
+}
+
+bool NetworkAddress::operator<(const NetworkAddress &other) const {
+  if (other.addr.s_addr < this->addr.s_addr) {
+    return true;
+  }
+
+  return other.port < this->port;
+}
+
+bool NetworkAddress::operator==(const NetworkAddress &other) const {
+  return other.addr.s_addr == this->addr.s_addr && other.port == this->port;
+}
+
+NetworkAddress& NetworkAddress::operator=(const NetworkAddress &other) {
+  if (this != &other) {
+    addr.s_addr = other.addr.s_addr;
+    port = other.port;
+  }
+
+  return *this;
+}
+
+wxString NetworkAddress::to_string() const {
+  if (addr.s_addr != 0) {
+    uint8_t *a = (uint8_t *)&addr;  // sin_addr is in network layout
+    return wxString::Format(wxT("%u.%u.%u.%u:%u"), a[0], a[1], a[2], a[3], ntohs(port));
+  }
+  return wxT("");
+}
+
+wxString NetworkAddress::FormatNetworkAddress() const {
+  uint8_t *a = (uint8_t *)&addr;  // sin_addr is in network layout
+  return wxString::Format(wxT("%u.%u.%u.%u"), a[0], a[1], a[2], a[3]);
+}
+
+wxString NetworkAddress::FormatNetworkAddressPort() const {
+  uint8_t *a = (uint8_t *)&addr;  // sin_addr is in network layout
+  return wxString::Format(wxT("%u.%u.%u.%u port %u"), a[0], a[1], a[2], a[3], ntohs(port));
+}
+
+struct sockaddr_in NetworkAddress::GetSockAddrIn() const {
+  struct sockaddr_in sin;
+
+  sin.sin_family = AF_INET;
+  sin.sin_addr = this->addr;
+  sin.sin_port = this->port;
+#ifdef __WX_MAC__
+  sin.sin_len = sizeof(sockaddr_in);
+#endif
+
+  return sin;
+}
+
+bool NetworkAddress::IsNull() const { return (addr.s_addr == 0); }
+
 PLUGIN_END_NAMESPACE

@@ -94,6 +94,11 @@ set(GENERAL_HEADERS
     include/socketutil.h
 #    include/RadarAPI.h
 #   include/DpRadarCommand.h
+    include/GeoPosition.h
+    include/NetworkAddress.h
+    include/PersistentSettings.h
+    include/RadarControlItem_api.h
+    include/RangeUnits.h
 )
 
 set(GENERAL_SOURCES
@@ -110,6 +115,7 @@ set(GENERAL_SOURCES
     src/RadarFactory.cpp
 #    src/RadarInfo.cpp
     src/Arpa.cpp
+    src/RadarControlItem.cpp
 #    src/RadarPanel.cpp
     src/SelectDialog.cpp
     src/TextureFont.cpp
