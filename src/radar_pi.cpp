@@ -1632,10 +1632,9 @@ bool radar_pi::LoadConfig(void) {
       pConf->Read(wxString::Format(wxT("Radar%dThreshold"), r), &v, 0);
       ri->m_threshold.Update(v);
 
-      //pConf->Read(wxString::Format(wxT("Radar%dTrailsState"), r), &state, RCS_OFF);
-      //pConf->Read(wxString::Format(wxT("Radar%dTrails"), r), &v, 0);
-      //ri->m_target_trails.Update(v, (RadarControlState)state);
-      ri->m_target_trails.Update(0);
+      pConf->Read(wxString::Format(wxT("Radar%dTrailsState"), r), &state, RCS_OFF);
+      pConf->Read(wxString::Format(wxT("Radar%dTrails"), r), &v, 0);
+      ri->m_target_trails.Update(v, (RadarControlState)state);      
 
       LOG_VERBOSE(wxT("Radar %d Target trails value %d state %d read from ini file"), r, v, state);
       pConf->Read(wxString::Format(wxT("Radar%dTrueTrailsMotion"), r), &v, 1);

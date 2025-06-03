@@ -5,6 +5,7 @@
 
 #include "RadarInfo.h"
 #include "MessageBox.h"
+#include "TrailBuffer.h"
 
 
 PLUGIN_BEGIN_NAMESPACE
@@ -95,6 +96,14 @@ RadarControlItem* RadarAPI::GetControlItem(ControlType controlType, int controlI
     }
     case CT_TARGET_BOOST: {
       result = &m_pi->m_radar[0]->m_target_boost;
+      break;
+    }
+    case CT_TARGET_ON_PPI: {
+      result = &m_pi->m_radar[0]->m_target_on_ppi;
+      break;
+    }
+    case CT_TARGET_TRAILS: {
+      result = &m_pi->m_radar[0]->m_target_trails;
       break;
     }
   }
@@ -267,5 +276,7 @@ void RadarAPI::ShowInfoDialog() {
     m_pi->m_pMessageBox->UpdateMessage(true);
   }
 }
+
+void RadarAPI::ClearTrails() { m_pi->m_radar[0]->m_trails->ClearTrails(); }
 
 PLUGIN_END_NAMESPACE
