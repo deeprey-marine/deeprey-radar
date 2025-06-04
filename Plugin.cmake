@@ -81,6 +81,7 @@ set(GENERAL_HEADERS
     include/RadarReceive.h
     include/RadarState.h
     include/RadarType.h
+    include/RadarType_api.h
     include/SelectDialog.h
     include/SoftwareControlSet.h
     include/TextureFont.h

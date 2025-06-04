@@ -106,6 +106,64 @@ RadarControlItem* RadarAPI::GetControlItem(ControlType controlType, int controlI
       result = &m_pi->m_radar[0]->m_target_trails;
       break;
     }
+    case CT_BEARING_ALIGNMENT: {
+      result = &m_pi->m_radar[0]->m_bearing_alignment;
+      break;
+    }
+    case CT_RANGE_ADJUSTMENT: {
+      result = &m_pi->m_radar[0]->m_range_adjustment;
+      break;
+    }
+    case CT_DISPLAY_TIMING: {
+      result = &m_pi->m_radar[0]->m_display_timing;
+      break;
+    }
+    case CT_MAIN_BANG_SUPPRESSION: {
+      result = &m_pi->m_radar[0]->m_main_bang_suppression;
+      break;
+    }
+    case CT_NO_TRANSMIT_START_1:
+    case CT_NO_TRANSMIT_START_2: 
+    case CT_NO_TRANSMIT_START_3: 
+    case CT_NO_TRANSMIT_START_4: {
+      result = &m_pi->m_radar[0]->m_no_transmit_start[controlType - CT_NO_TRANSMIT_START_1];
+      break;
+    }
+    case CT_NO_TRANSMIT_END_1:
+    case CT_NO_TRANSMIT_END_2:
+    case CT_NO_TRANSMIT_END_3:
+    case CT_NO_TRANSMIT_END_4: {
+      result = &m_pi->m_radar[0]->m_no_transmit_end[controlType - CT_NO_TRANSMIT_END_1];
+      break;
+    }
+    case CT_ANTENNA_HEIGHT: {
+      result = &m_pi->m_radar[0]->m_antenna_height;
+      break;
+    }
+    case CT_ANTENNA_FORWARD: {
+      result = &m_pi->m_radar[0]->m_antenna_forward;
+      break;
+    }
+    case CT_ANTENNA_STARBOARD: {
+      result = &m_pi->m_radar[0]->m_antenna_starboard;
+      break;
+    }
+    case CT_LOCAL_INTERFERENCE_REJECTION: {
+      result = &m_pi->m_radar[0]->m_local_interference_rejection;
+      break;
+    }
+    case CT_SIDE_LOBE_SUPPRESSION: {
+      result = &m_pi->m_radar[0]->m_side_lobe_suppression;
+      break;
+    }
+    case CT_MAIN_BANG_SIZE: {
+      result = &m_pi->m_radar[0]->m_main_bang_size;
+      break;
+    }
+    case CT_ACCENT_LIGHT: {
+      result = &m_pi->m_radar[0]->m_accent_light;
+      break;
+    }
   }
 
   return result;

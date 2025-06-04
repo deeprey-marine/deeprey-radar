@@ -261,12 +261,11 @@ struct receive_statistics {
     int broken_spokes;
     int missing_spokes;
 };
+PLUGIN_END_NAMESPACE
 
-typedef enum RadarType {
-#define DEFINE_RADAR(t, n, s, l, a, b, c, d) t,
-#include "RadarType.h"
-    RT_MAX
-} RadarType;
+#include "RadarType_api.h"
+
+PLUGIN_BEGIN_NAMESPACE
 
 const size_t RadarSpokes[RT_MAX] = {
 #define DEFINE_RADAR(t, n, s, l, a, b, c, d) s,
