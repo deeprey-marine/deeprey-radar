@@ -18,6 +18,12 @@ RadarAPI::~RadarAPI() {
   // destructor
 }
 
+template <class T, class... Types>
+void RadarAPI::CallCallbacks(std::unordered_map<uint64_t, std::function<T>>& callbacks, Types... args) {
+  for (auto callback : callbacks) {
+    callback.second(args...);
+  }
+}
 
 bool RadarAPI::SetControl(ControlType controlType, int value, int controlIndex) {
 
@@ -26,9 +32,7 @@ bool RadarAPI::SetControl(ControlType controlType, int value, int controlIndex) 
     SetControl(controlType, value, *controlItem);
 
     if (controlType == CT_OVERLAY_CANVAS) {
-      for (auto callback : m_canvasOverlayEnabledChangeCallbacks) {
-        callback.second(controlIndex);
-      }
+      CallCallbacks(m_canvasOverlayEnabledChangeCallbacks, controlIndex);
     }
   }
   return true;
@@ -294,23 +298,40 @@ void RadarAPI::SendMessageToDp(std::initializer_list<std::pair<const wxString, w
 bool RadarAPI::SelectRadarType(int type) {
   // Select radar type
   bool result = m_pi->SelectRadarType(type);
-  if (m_radarTypeChangeCallback) m_radarTypeChangeCallback();
+  CallCallbacks(m_radarTypeChangeCallbacks);
   return result;
 }
 
 int RadarAPI::GetRadarType() { return m_pi->m_radar[0]->m_radar_type; }
 
-void RadarAPI::SetRadarTypeChangeCallback(std::function<void()> callback) { m_radarTypeChangeCallback = callback; }
+uint64_t RadarAPI::AddRadarTypeChangeCallback(std::function<void()> callback) {
+  return AddCallback(m_radarTypeChangeCallbacks, callback);
+}
+
+template <class T>
+uint64_t RadarAPI::AddCallback(std::unordered_map<uint64_t, std::function<T>>& callbacks,
+                               std::function<T> callback) {
+  uint64_t id = m_nextCallbackID++;
+  callbacks[id] = callback;
+  return id;
+}
 
 uint64_t RadarAPI::AddCanvasOverlayEnabledChangeCallback(std::function<void(int)> callback) {
-  uint64_t id = m_nextCallbackID++;
-  m_canvasOverlayEnabledChangeCallbacks[id] = callback;
-  return id;
+  return AddCallback(m_canvasOverlayEnabledChangeCallbacks, callback);
+}
+
+template <class T>
+void RadarAPI::RemoveCallback(std::unordered_map<uint64_t, std::function<T>>& callbacks, uint64_t callbackID) {
+  callbacks.erase(callbackID);
 }
 
 void RadarAPI::RemoveCanvasOverlayEnabledChangeCallback(uint64_t callbackID)
 {
-  m_canvasOverlayEnabledChangeCallbacks.erase(callbackID);
+  RemoveCallback(m_canvasOverlayEnabledChangeCallbacks, callbackID);
+}
+
+void RadarAPI::RemoveRadarTypeChangeCallback(uint64_t callbackID) {
+  RemoveCallback(m_radarTypeChangeCallbacks, callbackID);
 }
 
 ControlInfo* RadarAPI::GetRadarControls() { return m_pi->m_radar[0]->m_ctrl; }

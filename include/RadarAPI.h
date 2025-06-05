@@ -69,7 +69,8 @@ public:
 
     virtual bool SelectRadarType(int type);
     virtual int GetRadarType();
-    virtual void SetRadarTypeChangeCallback(std::function<void()> callback);
+    virtual uint64_t AddRadarTypeChangeCallback(std::function<void()> callback);
+    virtual void RemoveRadarTypeChangeCallback(uint64_t callbackID);
     virtual uint64_t AddCanvasOverlayEnabledChangeCallback(std::function<void(int)> callback);
     virtual void RemoveCanvasOverlayEnabledChangeCallback(uint64_t callbackID);
 
@@ -87,6 +88,17 @@ public:
     void SendPongMessage();
 
 private:
+    template <class T, class... Types>
+    void CallCallbacks(std::unordered_map<uint64_t, std::function<T>>& callbacks,
+        Types... args);    
+    template <class T>
+    uint64_t AddCallback(
+        std::unordered_map<uint64_t, std::function<T>>& callbacks,
+        std::function<T> callback);
+    template <class T>
+    void RemoveCallback(
+        std::unordered_map<uint64_t, std::function<T>>& callbacks,
+        uint64_t callbackID);
 
     RadarControlItem* GetControlItem(ControlType controlType, int controlIndex = 0);
     void SetControl(ControlType controlType, int value, RadarControlItem& controlItem);
@@ -95,7 +107,7 @@ private:
     radar_pi* m_pi;
 
     IRadarOverlay* m_overlay; // single overlay pointer
-    std::function<void()> m_radarTypeChangeCallback;
+    std::unordered_map<uint64_t, std::function<void()>> m_radarTypeChangeCallbacks;
     std::unordered_map<uint64_t, std::function<void(int)>> m_canvasOverlayEnabledChangeCallbacks;
     uint64_t m_nextCallbackID;
 };
