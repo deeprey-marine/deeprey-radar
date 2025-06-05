@@ -168,6 +168,22 @@ RadarControlItem* RadarAPI::GetControlItem(ControlType controlType, int controlI
       result = &m_pi->m_radar[0]->m_accent_light;
       break;
     }
+    case CT_CENTER_VIEW: {
+      result = &m_pi->m_radar[0]->m_view_center;
+      break;
+    }
+    case CT_TRANSPARENCY: {
+      result = &m_pi->m_settings.overlay_transparency;
+      break;
+    }
+    case CT_TIMED_IDLE: {
+      result = &m_pi->m_radar[0]->m_timed_idle;
+      break;
+    }
+    case CT_TIMED_RUN: {
+      result = &m_pi->m_radar[0]->m_timed_run;
+      break;
+    }
   }
 
   return result;
