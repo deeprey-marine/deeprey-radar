@@ -6,7 +6,7 @@
 #include "RadarInfo.h"
 #include "MessageBox.h"
 #include "TrailBuffer.h"
-
+#include "Arpa.h"
 
 PLUGIN_BEGIN_NAMESPACE
 RadarAPI::RadarAPI(radar_pi* radarPlugin)
@@ -375,5 +375,33 @@ void RadarAPI::ShowInfoDialog() {
 void RadarAPI::ClearTrails() { m_pi->m_radar[0]->m_trails->ClearTrails(); }
 
 PersistentSettings* RadarAPI::GetSettings() { return &m_pi->m_settings; }
+
+void RadarAPI::ClearCursor() { m_pi->m_radar[0]->SetMouseVrmEbl(0., nanl("")); }
+
+void RadarAPI::AcquireTarget() {
+  ExtendedPosition target_pos;
+  target_pos.pos = m_pi->m_radar[0]->m_mouse_pos;
+  m_pi->m_radar[0]->m_arpa->AcquireNewMARPATarget(target_pos);
+}
+
+void RadarAPI::DeleteTarget() {
+  ExtendedPosition target_pos;
+  target_pos.pos = m_pi->m_radar[0]->m_mouse_pos;  
+  m_pi->m_radar[0]->m_arpa->DeleteTarget(target_pos);
+}
+
+void RadarAPI::DeleteAllTargets() {
+  for (size_t i = 0; i < M_SETTINGS.radar_count; i++) {
+    if (m_pi->m_radar[i]->m_arpa) {
+      m_pi->m_radar[i]->m_arpa->DeleteAllTargets();
+    }
+  }
+}
+
+void RadarAPI::PlaceEblVrm(int index) { m_pi->m_radar[0]->SetBearing(index); }
+
+int RadarAPI::GetArpaTargetsCount() { return m_pi->m_radar[0]->m_arpa->GetTargetCount(); }
+
+bool RadarAPI::HasEblVrm(int bearingLineIndex) { return !isnan(m_pi->m_radar[0]->m_vrm[bearingLineIndex]); }
 
 PLUGIN_END_NAMESPACE

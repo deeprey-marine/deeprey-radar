@@ -80,6 +80,13 @@ public:
     virtual void ShowInfoDialog();
     virtual void ClearTrails();
     virtual PersistentSettings* GetSettings();
+    virtual void ClearCursor();
+    virtual void AcquireTarget();
+    virtual void DeleteTarget();
+    virtual void DeleteAllTargets();
+    virtual void PlaceEblVrm(int index);
+    virtual int GetArpaTargetsCount();
+    virtual bool HasEblVrm(int bearingLineIndex);
 
     IRadarOverlay* GetOverlay() const { return m_overlay; }
 
