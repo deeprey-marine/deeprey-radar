@@ -753,7 +753,16 @@ void RadarInfo::RequestRadarState(RadarState state) {
 
 void RadarInfo::RenderGuardZone() {
   int start_bearing = 0, end_bearing = 0;
-  GLubyte red = 0, green = 200, blue = 0, alpha = 50;
+  wxColour guardZoneGreen = radar_pi::ApplyNightMode(wxColour(0, 200, 0), m_night_mode);
+  wxColour guardZoneRed = radar_pi::ApplyNightMode(wxColour(255, 0, 0), m_night_mode);
+  wxColour guardZoneBlue = radar_pi::ApplyNightMode(wxColour(0, 0, 200), m_night_mode);
+  wxColour noTransmitZone = radar_pi::ApplyNightMode(wxColour(250, 255, 255), m_night_mode);
+  
+  GLubyte red = guardZoneGreen.Red();
+  GLubyte green = guardZoneGreen.Green();
+  GLubyte blue = guardZoneGreen.Blue();
+  GLubyte alpha = 50;
+
 
   for (size_t z = 0; z < GUARD_ZONES; z++) {
     if (m_guard_zone[z]->m_alarm_on || m_guard_zone[z]->m_arpa_on || m_guard_zone[z]->m_show_time + 5 > time(0)) {
@@ -766,7 +775,7 @@ void RadarInfo::RenderGuardZone() {
       }
       switch (m_pi->m_settings.guard_zone_render_style) {
         case 1:
-          glColor4ub((GLubyte)255, (GLubyte)0, (GLubyte)0, (GLubyte)255);
+          glColor4ub(guardZoneRed.Red(), guardZoneRed.Green(), guardZoneRed.Blue(), 255);
           DrawOutlineArc(m_guard_zone[z]->m_outer_range, m_guard_zone[z]->m_inner_range, start_bearing, end_bearing, true);
           break;
         case 2:
@@ -779,9 +788,9 @@ void RadarInfo::RenderGuardZone() {
       }
     }
 
-    red = 0;
-    green = 0;
-    blue = 200;
+    red = guardZoneBlue.Red();
+    green = guardZoneBlue.Green();
+    blue = guardZoneBlue.Blue();
   }
 
   int range = m_range.GetValue();
@@ -797,7 +806,7 @@ void RadarInfo::RenderGuardZone() {
       if (start_bearing != end_bearing && start_bearing >= -180 && end_bearing >= -180) {
         start_bearing = MOD_DEGREES(start_bearing);
         end_bearing = MOD_DEGREES(end_bearing);
-        glColor4ub(250, 255, 255, alpha);
+        glColor4ub(noTransmitZone.Red(), noTransmitZone.Green(), noTransmitZone.Blue(), alpha);
         DrawFilledArc(range, 0, start_bearing, end_bearing);
       }
     }

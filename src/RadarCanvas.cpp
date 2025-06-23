@@ -215,30 +215,43 @@ wxSize RadarCanvas::RenderControlItem(const wxSize &loc, RadarControlItem &item,
   int value = item.GetValue();
   wxString label;
 
+
+  bool nightMode = m_ri->IsNightModeEnabled();
+
   switch (item.GetState()) {
     case RCS_OFF:
-      glColor4ub(100, 100, 100, 255);  // Grey
-      label << _("Off");
-      value = -1;
+        {
+          wxColour col = radar_pi::ApplyNightMode(wxColour(100, 100, 100), nightMode);
+          glColor4ub(col.Red(), col.Green(), col.Blue(), 255);
+          label << _("Off");
+          value = -1;
+      }
       break;
 
     case RCS_MANUAL:
-      glColor4ub(255, 100, 100, 255);  // Reddish
-      label.Printf(wxT("%d"), value);
+        {
+            wxColour col = radar_pi::ApplyNightMode(wxColour(255, 100, 100), nightMode);
+            glColor4ub(col.Red(), col.Green(), col.Blue(), 255);
+            label.Printf(wxT("%d"), value);
+        }
+     
       break;
 
     default:
-      glColor4ub(200, 255, 200, 255);  // Greenish
-      if (ci.autoNames && state > RCS_MANUAL && state <= RCS_MANUAL + ci.autoValues) {
-        label
-            << ci.autoNames[state - RCS_AUTO_1];  // A little shorter than in the control, but here we have colour to indicate Auto.
-      } else {
-        label << _("Auto");
-      }
-      if (!m_ri->m_showManualValueInAuto) {
-        value = -1;
-      }
-      break;
+        {
+            wxColour col = radar_pi::ApplyNightMode(wxColour(200, 255, 200), nightMode);
+            glColor4ub(col.Red(), col.Green(), col.Blue(), 255);
+              if (ci.autoNames && state > RCS_MANUAL && state <= RCS_MANUAL + ci.autoValues) {
+                label
+                    << ci.autoNames[state - RCS_AUTO_1];  // A little shorter than in the control, but here we have colour to indicate Auto.
+              } else {
+                label << _("Auto");
+              }
+              if (!m_ri->m_showManualValueInAuto) {
+                value = -1;
+              }
+        }
+       break;
   }
 
   m_FontNormal.GetTextExtent(label, &tx, &ty);
@@ -448,7 +461,9 @@ void RadarCanvas::FillCursorTexture() {
 }
 
 void RadarCanvas::RenderCursor(const wxSize &clientSize, float radius) {
-  glColor3f(1.0f, 1.0f, 1.0f);
+  bool nightMode = m_ri->IsNightModeEnabled();
+    wxColour cursorColor = radar_pi::ApplyNightMode(wxColour(255, 255, 255), nightMode);
+    glColor3ub(cursorColor.Red(), cursorColor.Green(), cursorColor.Blue());
 
   if (!isnan(m_ri->m_mouse_vrm)) {
     RenderCursor(clientSize, radius, m_ri->m_mouse_vrm * 1852., m_ri->m_mouse_ebl[m_ri->GetOrientation()]);
@@ -458,7 +473,9 @@ void RadarCanvas::RenderCursor(const wxSize &clientSize, float radius) {
 }
 
 void RadarCanvas::RenderChartCursor(const wxSize &clientSize, float radius) {
-  glColor3f(0.0f, 1.0f, 1.0f);
+  bool nightMode = m_ri->IsNightModeEnabled();
+    wxColour cursorColor = radar_pi::ApplyNightMode(wxColour(0, 255, 255), nightMode);
+    glColor3ub(cursorColor.Red(), cursorColor.Green(), cursorColor.Blue());
 
   RenderCursor(clientSize, radius, m_pi->m_cursor_pos);
 }
@@ -515,8 +532,12 @@ void RadarCanvas::RenderCursor(const wxSize &clientSize, float radius, double di
 
 void RadarCanvas::Render_EBL_VRM(const wxSize &clientSize, float radius) {
 
+     bool nightMode = m_ri->IsNightModeEnabled();
 
-  static const uint8_t rgb[BEARING_LINES][3] = {{22, 129, 154}, {45, 255, 254}};
+  wxColour ebl_colors[BEARING_LINES] = {
+        radar_pi::ApplyNightMode(wxColour(22, 129, 154), nightMode),
+        radar_pi::ApplyNightMode(wxColour(45, 255, 254), nightMode)
+    };
 
   float center_x = clientSize.GetWidth() / 2.0;
   float center_y = clientSize.GetHeight() / 2.0;
@@ -528,7 +549,7 @@ void RadarCanvas::Render_EBL_VRM(const wxSize &clientSize, float radius) {
 
   for (int b = 0; b < BEARING_LINES; b++) {
     float x, y;
-    glColor3ubv(rgb[b]);
+    glColor3ub(ebl_colors[b].Red(), ebl_colors[b].Green(), ebl_colors[b].Blue());
     glLineWidth(1.0);
     if (!isnan(m_ri->m_vrm[b])) {
       float scale = m_ri->m_vrm[b] * 1852.0 * radius / display_range;
