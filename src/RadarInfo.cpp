@@ -91,7 +91,16 @@ RadarInfo::RadarInfo(radar_pi *pi, int radar) {
   m_last_angle = 0;
   m_no_transmit_zones = 0;
 
-  m_night_mode = false;
+  switch (GetAppColorScheme()) {
+        case PI_GLOBAL_COLOR_SCHEME_RGB:  
+        case PI_GLOBAL_COLOR_SCHEME_DAY:  
+        case PI_GLOBAL_COLOR_SCHEME_DUSK:  
+           m_night_mode = false;
+           break;
+        case PI_GLOBAL_COLOR_SCHEME_NIGHT: 
+           m_night_mode = true;
+  }
+ 
 
   m_mouse_pos.lat = NAN;
   m_mouse_pos.lon = NAN;
