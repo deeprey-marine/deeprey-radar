@@ -94,6 +94,9 @@ public:
 
     void SendPongMessage();
 
+    virtual void SetNightMode(bool enabled);
+    virtual bool IsNightModeEnabled() const { return m_nightModeEnabled; }
+
 private:
     template <class T, class... Types>
     void CallCallbacks(std::unordered_map<uint64_t, std::function<T>>& callbacks,
@@ -117,6 +120,8 @@ private:
     std::unordered_map<uint64_t, std::function<void()>> m_radarTypeChangeCallbacks;
     std::unordered_map<uint64_t, std::function<void(int)>> m_canvasOverlayEnabledChangeCallbacks;
     uint64_t m_nextCallbackID;
+
+    bool m_nightModeEnabled = false;
 };
 
 }

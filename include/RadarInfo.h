@@ -356,6 +356,9 @@ public:
         return -1;
     }
 
+     void SetNightMode(bool enabled);
+    bool IsNightModeEnabled() const { return m_night_mode; }
+
 private:
     void ResetSpokes();
     void RenderRadarImage2(
@@ -385,6 +388,9 @@ private:
     int m_previous_orientation;
 
     GeoPosition m_radar_position;
+
+    bool m_night_mode;
+   
 };
 
 PLUGIN_END_NAMESPACE

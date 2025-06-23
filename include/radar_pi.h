@@ -522,6 +522,19 @@ public:
     long GetRangeMeters();
     long GetOptimalRangeMeters();
 
+    static wxColour ApplyNightMode(const wxColour& color, bool nightMode) {
+        if (!nightMode) {
+            return color;
+        }
+        return wxColour(
+            color.Red() / 3,
+            color.Green() / 3,
+            color.Blue() / 3,
+            color.Alpha()
+        );
+    }
+
+
     bool HaveRadarSerialNo(size_t r);
     RadarLocationInfo& GetRadarLocationInfo(size_t r);
 

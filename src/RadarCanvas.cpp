@@ -162,7 +162,17 @@ void RadarCanvas::RenderTexts(const wxSize &loc) {
   }
   */
 
-  glColor4ub(200, 255, 200, 255);
+   bool nightMode = m_ri->IsNightModeEnabled();
+
+
+  if (nightMode) {
+    // En mode nuit, utiliser des couleurs plus sombres
+    glColor4ub(67, 85, 67, 255);  // Vert sombre au lieu de (200, 255, 200)
+  } else {
+    glColor4ub(200, 255, 200, 255);  // Couleur normale
+  }
+
+
   s = m_ri->GetCanvasTextTopLeft();
   m_FontBig.RenderString(s, 0, 0);
 
@@ -253,6 +263,9 @@ void RadarCanvas::RenderRangeRingsAndHeading(const wxSize &clientSize, float r) 
   // Size of rendered string in pixels
   glPushMatrix();
   glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+   bool nightMode = m_ri->IsNightModeEnabled();
+
   double heading = 180.;
   if (m_pi->GetHeadingSource() != HEADING_NONE) {
     switch (m_ri->GetOrientation()) {
@@ -277,7 +290,9 @@ void RadarCanvas::RenderRangeRingsAndHeading(const wxSize &clientSize, float r) 
   }
 
   glTranslated(m_ri->m_off_center.x + m_ri->m_drag.x, m_ri->m_off_center.y + m_ri->m_drag.y, 0.);
-  glColor3ub(0, 126, 29);  // same color as HDS
+
+  wxColour ringColor = radar_pi::ApplyNightMode(wxColour(0, 126, 29), nightMode); // same color as HDS
+  glColor3ub(ringColor.Red(), ringColor.Green(), ringColor.Blue());  
   glLineWidth(1.0);
 
   int meters = m_ri->m_range.GetValue();
@@ -499,6 +514,8 @@ void RadarCanvas::RenderCursor(const wxSize &clientSize, float radius, double di
 }
 
 void RadarCanvas::Render_EBL_VRM(const wxSize &clientSize, float radius) {
+
+
   static const uint8_t rgb[BEARING_LINES][3] = {{22, 129, 154}, {45, 255, 254}};
 
   float center_x = clientSize.GetWidth() / 2.0;
@@ -550,6 +567,9 @@ void RadarCanvas::Render(wxPaintEvent &evt) {
   if (!m_pi->IsOpenGLEnabled()) {
     return;
   }
+
+  bool nightMode = m_ri->IsNightModeEnabled();
+
   LOG_VERBOSE(wxT("%s render OpenGL canvas %d by %d "), m_ri->m_name.c_str(), clientSize.GetWidth(), clientSize.GetHeight());
   double look_forward_dist = (double)wxMax(clientSize.GetWidth(), clientSize.GetHeight()) * ZOOM_FACTOR_OFFSET / 4.;
 
@@ -581,8 +601,9 @@ void RadarCanvas::Render(wxPaintEvent &evt) {
   font.SetPointSize(font.GetPointSize() * 2);  // Zoom text is really big
   m_FontMenuBold.Build(font);
 
-  wxColour bg = M_SETTINGS.ppi_background_colour;
+   wxColour bg = radar_pi::ApplyNightMode(M_SETTINGS.ppi_background_colour, nightMode);
   glClearColor(bg.Red() / 256.0, bg.Green() / 256.0, bg.Blue() / 256.0, bg.Alpha() / 256.0);
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // Clear the canvas
   glEnable(GL_TEXTURE_2D);                             // Enable textures
   glEnable(GL_COLOR_MATERIAL);
@@ -667,7 +688,7 @@ void RadarCanvas::Render(wxPaintEvent &evt) {
     wxColour aisFontColor = GetFontColour_PlugIn(aisTextFont);
 
     if (aisFont) {
-      wxColour newFontColor = M_SETTINGS.ais_text_colour;
+      wxColour newFontColor = radar_pi::ApplyNightMode(M_SETTINGS.ais_text_colour, nightMode);
       PlugInSetFontColor(aisTextFont, newFontColor);
       newFontColor = GetFontColour_PlugIn(aisTextFont);
     }

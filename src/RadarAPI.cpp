@@ -404,4 +404,14 @@ int RadarAPI::GetArpaTargetsCount() { return m_pi->m_radar[0]->m_arpa->GetTarget
 
 bool RadarAPI::HasEblVrm(int bearingLineIndex) { return !isnan(m_pi->m_radar[0]->m_vrm[bearingLineIndex]); }
 
+void RadarAPI::SetNightMode(bool enabled) {
+    m_nightModeEnabled = enabled;
+    // Notifier tous les radars du changement
+    for (size_t i = 0; i < m_pi->m_settings.radar_count; i++) {
+        if (m_pi->m_radar[i]) {
+            m_pi->m_radar[i]->SetNightMode(enabled);
+        }
+    }
+}
+
 PLUGIN_END_NAMESPACE

@@ -91,6 +91,8 @@ RadarInfo::RadarInfo(radar_pi *pi, int radar) {
   m_last_angle = 0;
   m_no_transmit_zones = 0;
 
+  m_night_mode = false;
+
   m_mouse_pos.lat = NAN;
   m_mouse_pos.lon = NAN;
   for (int i = 0; i < ORIENTATION_NUMBER; i++) {
@@ -461,12 +463,16 @@ void RadarInfo::ComputeColourMap() {
   for (int i = 0; i < BLOB_COLOURS; i++) {
     m_colour_map_rgb[i] = PixelColour(0, 0, 0);
   }
-  float r1 = M_SETTINGS.trail_start_colour.Red();
-  float g1 = M_SETTINGS.trail_start_colour.Green();
-  float b1 = M_SETTINGS.trail_start_colour.Blue();
-  float r2 = M_SETTINGS.trail_end_colour.Red();
-  float g2 = M_SETTINGS.trail_end_colour.Green();
-  float b2 = M_SETTINGS.trail_end_colour.Blue();
+
+   wxColour trail_start = radar_pi::ApplyNightMode(M_SETTINGS.trail_start_colour, m_night_mode);
+  wxColour trail_end = radar_pi::ApplyNightMode(M_SETTINGS.trail_end_colour, m_night_mode);
+
+  float r1 = trail_start.Red();
+  float g1 = trail_start.Green();
+  float b1 = trail_start.Blue();
+  float r2 = trail_end.Red();
+  float g2 = trail_end.Green();
+  float b2 = trail_end.Blue();
   float delta_r = (r2 - r1) / BLOB_HISTORY_COLOURS;
   float delta_g = (g2 - g1) / BLOB_HISTORY_COLOURS;
   float delta_b = (b2 - b1) / BLOB_HISTORY_COLOURS;
@@ -482,11 +488,12 @@ void RadarInfo::ComputeColourMap() {
   }
   // }
 
-  m_colour_map_rgb[BLOB_DOPPLER_APPROACHING] = M_SETTINGS.doppler_approaching_colour;
-  m_colour_map_rgb[BLOB_DOPPLER_RECEDING] = M_SETTINGS.doppler_receding_colour;
-  m_colour_map_rgb[BLOB_STRONG] = M_SETTINGS.strong_colour;
-  m_colour_map_rgb[BLOB_INTERMEDIATE] = M_SETTINGS.intermediate_colour;
-  m_colour_map_rgb[BLOB_WEAK] = M_SETTINGS.weak_colour;
+  m_colour_map_rgb[BLOB_DOPPLER_APPROACHING] = radar_pi::ApplyNightMode(M_SETTINGS.doppler_approaching_colour, m_night_mode);
+  m_colour_map_rgb[BLOB_DOPPLER_RECEDING] = radar_pi::ApplyNightMode(M_SETTINGS.doppler_receding_colour, m_night_mode);
+  m_colour_map_rgb[BLOB_STRONG] = radar_pi::ApplyNightMode(M_SETTINGS.strong_colour, m_night_mode);
+  m_colour_map_rgb[BLOB_INTERMEDIATE] = radar_pi::ApplyNightMode(M_SETTINGS.intermediate_colour, m_night_mode);
+  m_colour_map_rgb[BLOB_WEAK] = radar_pi::ApplyNightMode(M_SETTINGS.weak_colour, m_night_mode);
+
 }
 
 void RadarInfo::ResetSpokes() {
@@ -1794,6 +1801,21 @@ NetworkAddress RadarInfo::GetRadarInterfaceAddress() {
   wxCriticalSectionLocker lock(m_exclusive);
   return m_radar_interface_address;
 }
+
+
+void RadarInfo::SetNightMode(bool enabled) {
+    if (m_night_mode != enabled) {
+        m_night_mode = enabled;
+        
+        // Recalculer la colour map avec les nouvelles couleurs
+        ComputeColourMap();
+        
+        // Forcer un rafraîchissement
+        RefreshDisplay();
+    }
+}
+
+
 
 PLUGIN_END_NAMESPACE
 
