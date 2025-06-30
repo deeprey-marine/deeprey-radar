@@ -44,8 +44,10 @@ EVT_SIZE(RadarCanvas::OnSize)
 EVT_PAINT(RadarCanvas::Render)
 EVT_MOUSEWHEEL(RadarCanvas::OnMouseWheel)
 EVT_LEFT_DOWN(RadarCanvas::OnMouseClickDown)
-EVT_MOTION(RadarCanvas::OnMouseMotion)
 EVT_LEFT_UP(RadarCanvas::OnMouseClickUp)
+EVT_RIGHT_DOWN(RadarCanvas::OnMouseClickDown)
+EVT_RIGHT_UP(RadarCanvas::OnMouseClickUp)
+EVT_MOTION(RadarCanvas::OnMouseMotion)
 END_EVENT_TABLE()
 
 static int attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, WX_GL_STENCIL_SIZE, 8, 0};
@@ -794,6 +796,16 @@ void RadarCanvas::OnMouseMotion(wxMouseEvent &event) {
 }
 
 void RadarCanvas::OnMouseClickUp(wxMouseEvent &event) {
+
+
+    if (g_radarAPI) {
+        IRadarOverlay* overlay = g_radarAPI->GetOverlay();
+        if (overlay) {
+            overlay->OnMouseClick(event);
+        }
+    }
+
+
   int x, y, w, h;
   event.GetPosition(&x, &y);
   if (abs(x - m_mouse_down.x) > 10 || abs(y - m_mouse_down.y) > 10) {
