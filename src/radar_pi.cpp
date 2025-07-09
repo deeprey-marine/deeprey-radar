@@ -1558,7 +1558,7 @@ bool radar_pi::LoadConfig(void) {
       m_COGTable[i] = NAN;
     }
 
-    pConf->SetPath(wxT("/Plugins/Radar"));
+    pConf->SetPath(wxT("/Plugins/DeepreyRadar"));
 
     // Valgrind: This needs to be set before we set range, since that uses this
     pConf->Read(wxT("RangeUnits"), &v, RANGE_NAUTIC);
@@ -1748,8 +1748,8 @@ bool radar_pi::LoadConfig(void) {
 bool radar_pi::SaveConfig(void) {
   wxFileConfig *pConf = m_pconfig;
   if (pConf) {
-    pConf->DeleteGroup(wxT("/Plugins/Radar"));
-    pConf->SetPath(wxT("/Plugins/Radar"));
+    pConf->DeleteGroup(wxT("/Plugins/DeepreyRadar"));
+    pConf->SetPath(wxT("/Plugins/DeepreyRadar"));
 
     pConf->Write(wxT("AlarmPosX"), m_settings.alarm_pos.x);
     pConf->Write(wxT("AlarmPosY"), m_settings.alarm_pos.y);
