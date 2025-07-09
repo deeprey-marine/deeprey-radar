@@ -144,22 +144,22 @@ static const int SECONDS_PER_TIMED_RUN_SETTING = 60;
 #endif
 
 extern int g_verbose;
-#define LOGLEVEL_INFO 0
-#define LOGLEVEL_VERBOSE 1
-#define LOGLEVEL_DIALOG 2
-#define LOGLEVEL_TRANSMIT 4
-#define LOGLEVEL_RECEIVE 8
-#define LOGLEVEL_GUARD 16
-#define LOGLEVEL_ARPA 32
-#define LOGLEVEL_REPORTS 64
-#define LOGLEVEL_INTER 128
+#define LOGLEVEL_INFO 1
+#define LOGLEVEL_VERBOSE 2
+#define LOGLEVEL_DIALOG 4
+#define LOGLEVEL_TRANSMIT 8
+#define LOGLEVEL_RECEIVE 16
+#define LOGLEVEL_GUARD 32
+#define LOGLEVEL_ARPA 64
+#define LOGLEVEL_REPORTS 128
+#define LOGLEVEL_INTER 256
 #define IF_LOG_AT_LEVEL(x) if ((g_verbose & (x)) != 0)
 
 #define IF_LOG_AT(x, y)                                                        \
     do {                                                                       \
         IF_LOG_AT_LEVEL(x) { y; }                                              \
     } while (0)
-#define LOG_INFO wxLogMessage
+#define LOG_INFO IF_LOG_AT_LEVEL(LOGLEVEL_INFO) wxLogMessage
 #define LOG_VERBOSE IF_LOG_AT_LEVEL(LOGLEVEL_VERBOSE) wxLogMessage
 #define LOG_DIALOG IF_LOG_AT_LEVEL(LOGLEVEL_DIALOG) wxLogMessage
 #define LOG_TRANSMIT IF_LOG_AT_LEVEL(LOGLEVEL_TRANSMIT) wxLogMessage
