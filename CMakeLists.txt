@@ -62,7 +62,13 @@ include_directories(
 					${CMAKE_SOURCE_DIR}/include/emulator
 )
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/radar-bridge")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/radar-bridge"
+					${CMAKE_SOURCE_DIR}/radar-bridge/raymarine
+					${CMAKE_SOURCE_DIR}/radar-bridge/navico
+					${CMAKE_SOURCE_DIR}/radar-bridge/garminxhd
+					${CMAKE_SOURCE_DIR}/radar-bridge/garminhd
+					${CMAKE_SOURCE_DIR}/radar-bridge/emulator
+)
 
 
 add_subdirectory("opencpn-libs/${PKG_API_LIB}")

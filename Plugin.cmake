@@ -57,15 +57,15 @@ set(PKG_INFO_URL       "https://opencpn.org/OpenCPN/plugins/radarPI.html")
 # 1) Général
 set(GENERAL_HEADERS
     radar-bridge/ControlType.h
-    include/ControlInfo.h
+    radar-bridge/ControlInfo.h
     include/ControlsDialog.h
-    include/GuardZone.h
+    radar-bridge/GuardZone.h
     include/GuardZoneBogey.h
     include/Kalman.h
     include/Matrix.h
     include/MessageBox.h
     include/OptionsDialog.h
-    include/Orientation.h
+    radar-bridge/Orientation.h
 #    include/RadarCanvas.h
     include/RadarControl.h
     include/RadarControlItem.h
@@ -80,8 +80,8 @@ set(GENERAL_HEADERS
 #    include/RadarPanel.h
     include/RadarReceive.h
     radar-bridge/RadarState.h
-    include/RadarType.h
-    include/RadarType_api.h
+    radar-bridge/RadarType.h
+    radar-bridge/RadarType_api.h
     include/SelectDialog.h
     include/SoftwareControlSet.h
     include/TextureFont.h
@@ -90,16 +90,16 @@ set(GENERAL_HEADERS
     include/icons.h
     include/pi_common.h
 #    include/radar_pi.h
-    include/radar_pi_api.h
+    radar-bridge/radar_pi_api.h
     include/shaderutil.h
     include/socketutil.h
 #    include/RadarAPI.h
 #   include/DpRadarCommand.h
-    include/GeoPosition.h
-    include/NetworkAddress.h
-    include/PersistentSettings.h
-    include/RadarControlItem_api.h
-    include/RangeUnits.h
+    radar-bridge/GeoPosition.h
+    radar-bridge/NetworkAddress.h
+    radar-bridge/PersistentSettings.h
+    radar-bridge/RadarControlItem_api.h
+    radar-bridge/RangeUnits.h
 )
 
 set(GENERAL_SOURCES
@@ -142,7 +142,7 @@ set(EMULATOR_HEADERS
     include/emulator/EmulatorControlSet.h
     include/emulator/EmulatorControlsDialog.h
     include/emulator/EmulatorReceive.h
-    include/emulator/emulatortype.h
+    radar-bridge/emulator/emulatortype.h
 )
 set(EMULATOR_SOURCES
     src/emulator/EmulatorControl.cpp
@@ -156,7 +156,7 @@ set(GARMINHD_HEADERS
     include/garminhd/GarminHDControlSet.h
     include/garminhd/GarminHDControlsDialog.h
     include/garminhd/GarminHDReceive.h
-    include/garminhd/garminhdtype.h
+    radar-bridge/garminhd/garminhdtype.h
 )
 set(GARMINHD_SOURCES
     src/garminhd/GarminHDControl.cpp
@@ -170,7 +170,7 @@ set(GARMINXHD_HEADERS
     include/garminxhd/GarminxHDControlSet.h
     include/garminxhd/GarminxHDControlsDialog.h
     include/garminxhd/GarminxHDReceive.h
-    include/garminxhd/garminxhdtype.h
+    radar-bridge/garminxhd/garminxhdtype.h
 )
 set(GARMINXHD_SOURCES
     src/garminxhd/GarminxHDControl.cpp
@@ -181,18 +181,18 @@ set(GARMINXHD_SOURCES
 # 5) Navico
 set(NAVICO_HEADERS
     include/navico/Header.h
-    include/navico/NavicoCommon.h
+    radar-bridge/navico/NavicoCommon.h
     include/navico/NavicoControl.h
     include/navico/NavicoControlSet.h
     include/navico/NavicoControlsDialog.h
     include/navico/NavicoLocate.h
     include/navico/NavicoReceive.h
-    include/navico/br24type.h
-    include/navico/br3gtype.h
-    include/navico/br4gatype.h
-    include/navico/br4gbtype.h
-    include/navico/haloatype.h
-    include/navico/halobtype.h
+    radar-bridge/navico/br24type.h
+    radar-bridge/navico/br3gtype.h
+    radar-bridge/navico/br4gatype.h
+    radar-bridge/navico/br4gbtype.h
+    radar-bridge/navico/haloatype.h
+    radar-bridge/navico/halobtype.h
 )
 set(NAVICO_SOURCES
     src/navico/NavicoControl.cpp
@@ -208,8 +208,8 @@ set(RAYMARINE_HEADERS
     include/raymarine/RME120ControlSet.h
     include/raymarine/RME120ControlsDialog.h
     include/raymarine/RaymarineReceive.h
-    include/raymarine/RME120type.h
-    include/raymarine/RMQuantumtype.h
+    radar-bridge/raymarine/RME120type.h
+    radar-bridge/raymarine/RMQuantumtype.h
     include/raymarine/RaymarineCommon.h
     include/raymarine/RaymarineLocate.h
     include/raymarine/RMQuantumControlsDialog.h
