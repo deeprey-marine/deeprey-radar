@@ -56,7 +56,7 @@ set(PKG_INFO_URL       "https://opencpn.org/OpenCPN/plugins/radarPI.html")
 
 # 1) Général
 set(GENERAL_HEADERS
-    include/ControlType.h
+    radar-bridge/ControlType.h
     include/ControlInfo.h
     include/ControlsDialog.h
     include/GuardZone.h
@@ -69,7 +69,7 @@ set(GENERAL_HEADERS
 #    include/RadarCanvas.h
     include/RadarControl.h
     include/RadarControlItem.h
-    include/RadarControlState.h
+    radar-bridge/RadarControlState.h
     include/RadarDraw.h
     include/RadarDrawShader.h
     include/RadarDrawVertex.h
@@ -79,7 +79,7 @@ set(GENERAL_HEADERS
     include/Arpa.h
 #    include/RadarPanel.h
     include/RadarReceive.h
-    include/RadarState.h
+    radar-bridge/RadarState.h
     include/RadarType.h
     include/RadarType_api.h
     include/SelectDialog.h
@@ -233,7 +233,7 @@ set(IMPORTANT_HEADERS
     include/radar_pi.h
     include/RadarInfo.h
     include/RadarCanvas.h
-    include/RadarAPI.h
+    radar-bridge/RadarAPI.h
     include/DpRadarCommand.h
 )
 

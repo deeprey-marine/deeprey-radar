@@ -40,6 +40,18 @@ if(NOT WIN32
 endif()
 
 add_library(${CMAKE_PROJECT_NAME} SHARED EXCLUDE_FROM_ALL ${SRC} ${HEADERS})
+
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND DEPLOY_ON_BUILD)
+    add_custom_command(
+        TARGET ${CMAKE_PROJECT_NAME}
+        POST_BUILD
+        COMMAND copy "$(TargetPath)" "$(LOCALAPPDATA)\\opencpn\\plugins\\$(TargetFileName)"
+        COMMENT "Deploy to import location"
+        VERBATIM
+    )
+endif()
+
 include_directories(
 					BEFORE 
 					${CMAKE_SOURCE_DIR}/include
@@ -49,6 +61,8 @@ include_directories(
 					${CMAKE_SOURCE_DIR}/include/garminhd
 					${CMAKE_SOURCE_DIR}/include/emulator
 )
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/radar-bridge")
 
 
 add_subdirectory("opencpn-libs/${PKG_API_LIB}")
