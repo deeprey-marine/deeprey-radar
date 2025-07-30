@@ -62,12 +62,12 @@ include_directories(
 					${CMAKE_SOURCE_DIR}/include/emulator
 )
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/radar-bridge"
-					${CMAKE_SOURCE_DIR}/radar-bridge/raymarine
-					${CMAKE_SOURCE_DIR}/radar-bridge/navico
-					${CMAKE_SOURCE_DIR}/radar-bridge/garminxhd
-					${CMAKE_SOURCE_DIR}/radar-bridge/garminhd
-					${CMAKE_SOURCE_DIR}/radar-bridge/emulator
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deeprey-api/radar"
+					${CMAKE_SOURCE_DIR}/deeprey-api/radar/raymarine
+					${CMAKE_SOURCE_DIR}/deeprey-api/radar/navico
+					${CMAKE_SOURCE_DIR}/deeprey-api/radar/garminxhd
+					${CMAKE_SOURCE_DIR}/deeprey-api/radar/garminhd
+					${CMAKE_SOURCE_DIR}/deeprey-api/radar/emulator
 )
 
 

@@ -56,20 +56,20 @@ set(PKG_INFO_URL       "https://opencpn.org/OpenCPN/plugins/radarPI.html")
 
 # 1) Général
 set(GENERAL_HEADERS
-    radar-bridge/ControlType.h
-    radar-bridge/ControlInfo.h
+    deeprey-api/radar/ControlType.h
+    deeprey-api/radar/ControlInfo.h
     include/ControlsDialog.h
-    radar-bridge/GuardZone.h
+    deeprey-api/radar/GuardZone.h
     include/GuardZoneBogey.h
     include/Kalman.h
     include/Matrix.h
     include/MessageBox.h
     include/OptionsDialog.h
-    radar-bridge/Orientation.h
+    deeprey-api/radar/Orientation.h
 #    include/RadarCanvas.h
     include/RadarControl.h
     include/RadarControlItem.h
-    radar-bridge/RadarControlState.h
+    deeprey-api/radar/RadarControlState.h
     include/RadarDraw.h
     include/RadarDrawShader.h
     include/RadarDrawVertex.h
@@ -79,9 +79,9 @@ set(GENERAL_HEADERS
     include/Arpa.h
 #    include/RadarPanel.h
     include/RadarReceive.h
-    radar-bridge/RadarState.h
-    radar-bridge/RadarType.h
-    radar-bridge/RadarType_api.h
+    deeprey-api/radar/RadarState.h
+    deeprey-api/radar/RadarType.h
+    deeprey-api/radar/RadarType_api.h
     include/SelectDialog.h
     include/SoftwareControlSet.h
     include/TextureFont.h
@@ -90,16 +90,16 @@ set(GENERAL_HEADERS
     include/icons.h
     include/pi_common.h
 #    include/radar_pi.h
-    radar-bridge/radar_pi_api.h
+    deeprey-api/radar/radar_pi_api.h
     include/shaderutil.h
     include/socketutil.h
 #    include/RadarAPI.h
 #   include/DpRadarCommand.h
-    radar-bridge/GeoPosition.h
-    radar-bridge/NetworkAddress.h
-    radar-bridge/PersistentSettings.h
-    radar-bridge/RadarControlItem_api.h
-    radar-bridge/RangeUnits.h
+    deeprey-api/radar/GeoPosition.h
+    deeprey-api/radar/NetworkAddress.h
+    deeprey-api/radar/PersistentSettings.h
+    deeprey-api/radar/RadarControlItem_api.h
+    deeprey-api/radar/RangeUnits.h
 )
 
 set(GENERAL_SOURCES
@@ -142,7 +142,7 @@ set(EMULATOR_HEADERS
     include/emulator/EmulatorControlSet.h
     include/emulator/EmulatorControlsDialog.h
     include/emulator/EmulatorReceive.h
-    radar-bridge/emulator/emulatortype.h
+    deeprey-api/radar/emulator/emulatortype.h
 )
 set(EMULATOR_SOURCES
     src/emulator/EmulatorControl.cpp
@@ -156,7 +156,7 @@ set(GARMINHD_HEADERS
     include/garminhd/GarminHDControlSet.h
     include/garminhd/GarminHDControlsDialog.h
     include/garminhd/GarminHDReceive.h
-    radar-bridge/garminhd/garminhdtype.h
+    deeprey-api/radar/garminhd/garminhdtype.h
 )
 set(GARMINHD_SOURCES
     src/garminhd/GarminHDControl.cpp
@@ -170,7 +170,7 @@ set(GARMINXHD_HEADERS
     include/garminxhd/GarminxHDControlSet.h
     include/garminxhd/GarminxHDControlsDialog.h
     include/garminxhd/GarminxHDReceive.h
-    radar-bridge/garminxhd/garminxhdtype.h
+    deeprey-api/radar/garminxhd/garminxhdtype.h
 )
 set(GARMINXHD_SOURCES
     src/garminxhd/GarminxHDControl.cpp
@@ -181,18 +181,18 @@ set(GARMINXHD_SOURCES
 # 5) Navico
 set(NAVICO_HEADERS
     include/navico/Header.h
-    radar-bridge/navico/NavicoCommon.h
+    deeprey-api/radar/navico/NavicoCommon.h
     include/navico/NavicoControl.h
     include/navico/NavicoControlSet.h
     include/navico/NavicoControlsDialog.h
     include/navico/NavicoLocate.h
     include/navico/NavicoReceive.h
-    radar-bridge/navico/br24type.h
-    radar-bridge/navico/br3gtype.h
-    radar-bridge/navico/br4gatype.h
-    radar-bridge/navico/br4gbtype.h
-    radar-bridge/navico/haloatype.h
-    radar-bridge/navico/halobtype.h
+    deeprey-api/radar/navico/br24type.h
+    deeprey-api/radar/navico/br3gtype.h
+    deeprey-api/radar/navico/br4gatype.h
+    deeprey-api/radar/navico/br4gbtype.h
+    deeprey-api/radar/navico/haloatype.h
+    deeprey-api/radar/navico/halobtype.h
 )
 set(NAVICO_SOURCES
     src/navico/NavicoControl.cpp
@@ -208,8 +208,8 @@ set(RAYMARINE_HEADERS
     include/raymarine/RME120ControlSet.h
     include/raymarine/RME120ControlsDialog.h
     include/raymarine/RaymarineReceive.h
-    radar-bridge/raymarine/RME120type.h
-    radar-bridge/raymarine/RMQuantumtype.h
+    deeprey-api/radar/raymarine/RME120type.h
+    deeprey-api/radar/raymarine/RMQuantumtype.h
     include/raymarine/RaymarineCommon.h
     include/raymarine/RaymarineLocate.h
     include/raymarine/RMQuantumControlsDialog.h
@@ -233,7 +233,7 @@ set(IMPORTANT_HEADERS
     include/radar_pi.h
     include/RadarInfo.h
     include/RadarCanvas.h
-    radar-bridge/RadarAPI.h
+    deeprey-api/radar/RadarAPI.h
     include/DpRadarCommand.h
 )
 
